@@ -1,0 +1,30 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - "*.qmd"
+  resources:
+    - "img/"
+
+website:
+  title: "Bayes, *stat*!"
+  navbar:
+    background: dark
+    left:
+      - href: index.qmd
+        text: Home
+      - href: day1.qmd
+        text: Day 1 
+      - href: day2.qmd
+        text: Day 2 
+
+format:
+  html:
+    theme: 
+      light: flatly
+      dark: darkly
+    css: styles.css
+    toc: true
+
+callout-icon: false
+

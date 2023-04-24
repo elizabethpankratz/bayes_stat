@@ -1,0 +1,6 @@
+---
+title: "Bayes, *stat*! A crash course in Bayesian inference"
+---
+
+Lorem ipsum dolor sit amet.
+
