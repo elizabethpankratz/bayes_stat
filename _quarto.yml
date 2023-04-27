@@ -8,15 +8,35 @@ project:
 
 website:
   title: "Bayes, *stat*!"
+
   navbar:
     background: dark
     left:
-      - href: index.qmd
-        text: Home
-      - href: day1.qmd
-        text: Day 1 
-      - href: day2.qmd
-        text: Day 2 
+      - file: index.qmd
+        text: "Home"
+      - file: day1.qmd
+        text: "Day 1" 
+      - file: day2.qmd
+        text: "Day 2"
+
+  sidebar:
+    - title: "Day 1"
+      style: "docked"
+      contents:
+        - day1.qmd
+        - day1-1.qmd
+        - day1-2.qmd
+        - day1-3.qmd
+    - title: "Day 2"
+      style: "docked"
+      contents:
+        - day2.qmd
+        - day2-1.qmd
+        - day2-2.qmd
+        - day2-3.qmd
+
+  page-navigation: true
+
 
 format:
   html:

@@ -1,6 +1,13 @@
 ---
-title: "Bayes, *stat*! A crash course in Bayesian inference"
+title: "A crash course in Bayesian inference"
+subtitle: "CLE Retreat (May 12–15, 2023)"
+sidebar: false
 ---
 
 Lorem ipsum dolor sit amet.
 
+<br><br><br>
+
+Thanks to n loewen for help coming up with the workshop name.
+
+Copyright Elizabeth Pankratz 2023.
