@@ -10,7 +10,7 @@ website:
   title: "Bayes, *stat*!"
 
   navbar:
-    background: dark
+    background: primary
     left:
       - file: index.qmd
         text: "Home"
@@ -18,22 +18,26 @@ website:
         text: "Day 1" 
       - file: day2.qmd
         text: "Day 2"
+      - file: resources.qmd
+        text: "Resources"
 
   sidebar:
     - title: "Day 1"
       style: "docked"
       contents:
-        - day1.qmd
+        - file: day1.qmd
+          text: "Learning objectives"
         - day1-1.qmd
         - day1-2.qmd
-        - day1-3.qmd
+        - day1-recap.qmd
     - title: "Day 2"
       style: "docked"
       contents:
-        - day2.qmd
+        - file: day2.qmd
+          text: "Learning objectives"
         - day2-1.qmd
         - day2-2.qmd
-        - day2-3.qmd
+        - day2-recap.qmd
 
   page-navigation: true
 

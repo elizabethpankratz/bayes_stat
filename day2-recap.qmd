@@ -1,0 +1,19 @@
+---
+title: "Recap and take-aways"
+---
+
+## Recap of today
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+
+## Take-aways
+
+- Practice dealing with uncertainty.
+- What does a frequentist model do that a Bayesian model does not do? NHST vs. effect size estimation.
+  - What is the difference between effect size estimation and hypothesis testing? 
+    - What options are out there for Bayesian hypothesis testing? 
+- What does a Bayesian model do that a frequentist model does not do?
+  - Licenses more flexible interpretations, since we're not stuck in the binary of "reject the null or not".
+- Why do some people prefer Bayesian analyses?
+- Why is Bayes currently up and coming? / Why are frequentist models the standard?

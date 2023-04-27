@@ -1,13 +1,27 @@
 ---
 title: "A crash course in Bayesian inference"
-subtitle: "CLE Retreat (May 12–15, 2023)"
+subtitle: "CLE Retreat 2023"
 sidebar: false
 ---
 
-Lorem ipsum dolor sit amet.
+**What you can expect from this two-day workshop:**
 
-<br><br><br>
+- Learn the conceptual whys and wherefores of Bayesian inference.
+- Get hands-on practice fitting Bayesian models in R using brms.
+- Have some discussions as well as some individual work time.
 
-Thanks to n loewen for help coming up with the workshop name.
+
+**Intended audience:**
+
+- You know how to use R and RStudio.
+- You are familiar with linear regression models and want to know how to think about them from a Bayesian perspective.
+
+
+To be able to run the code we'll use, **please follow the set-up instructions [here](https://stefanocoretta.github.io/sqmb/setup.html), and make sure everything is running before the workshop begins.**
+
+
+---
+
+Thanks to n loewen for help coming up with the workshop name :)
 
 Copyright Elizabeth Pankratz 2023.

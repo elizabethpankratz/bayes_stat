@@ -1,0 +1,25 @@
+---
+title: "Elizabeth's recommended resources"
+---
+
+**For total newcomers to stats in R:** 
+
+- Materials from Stefano Coretta's [Statistical and Quantitative Methods course](https://stefanocoretta.github.io/sqmb/syllabus.html) from this past winter (partly developed by yours truly!).
+  
+  
+**For people seeking intuitions and lots of detail presented approachably:** 
+
+- [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/) by Richard McElreath.
+  - This book doesn't use brms, but here's [a translation into brms + tidyverse](https://bookdown.org/content/4857/) by A Solomon Kurz.
+- McElreath has a [series of free lectures](https://www.youtube.com/playlist?list=PLDcUM9US4XdPz-KxHM4XHt7uUVGWWVSus) too.
+  
+  
+**For people seeking more formalisation and math:** 
+
+- [An Introduction to Bayesian Data Analysis for Cognitive Science](https://vasishth.github.io/bayescogsci/book/) by Bruno Nicenboim, Daniel Schad, and Shravan Vasishth.
+  - This book is my stats bible ♥️
+
+
+And work I don't have personal experience with but that others say is helpful:
+
+- [A Student's Guide to Bayesian Statistics](https://uk.sagepub.com/en-gb/eur/book/student’s-guide-bayesian-statistics) by Ben Lambert

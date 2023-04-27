@@ -4,7 +4,7 @@
     "href": "day1-1.html",
     "title": "Day 1 subpage 1",
     "section": "",
-    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ncars %>% \n  ggplot(aes(x = speed, y = dist)) +\n  geom_point()"
   },
   {
     "objectID": "day1-2.html",
@@ -14,18 +14,18 @@
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
   },
   {
-    "objectID": "day1-3.html",
-    "href": "day1-3.html",
-    "title": "Day 1 subpage 3",
+    "objectID": "day1-recap.html",
+    "href": "day1-recap.html",
+    "title": "Recap",
     "section": "",
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
   },
   {
     "objectID": "day1.html",
     "href": "day1.html",
-    "title": "Day 1 Home",
+    "title": "Learning objectives for Day 1",
     "section": "",
-    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ncars %>% \n  ggplot(aes(x = speed, y = dist)) +\n  geom_point()"
+    "text": "How does Bayesian reasoning work? \nWhat’s the anatomy of a Bayesian model?  \nHow do different priors influence the model’s estimates?  \nHow does Bayesian inference differ from frequentist inference?"
   },
   {
     "objectID": "day2-1.html",
@@ -42,31 +42,38 @@
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
   },
   {
-    "objectID": "day2-3.html",
-    "href": "day2-3.html",
-    "title": "Day 2 subpage 3",
+    "objectID": "day2-recap.html",
+    "href": "day2-recap.html",
+    "title": "Recap and take-aways",
     "section": "",
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+  },
+  {
+    "objectID": "day2-recap.html#take-aways",
+    "href": "day2-recap.html#take-aways",
+    "title": "Recap and take-aways",
+    "section": "Take-aways",
+    "text": "Take-aways\n\nPractice dealing with uncertainty.\nWhat does a frequentist model do that a Bayesian model does not do? NHST vs. effect size estimation.\n\nWhat is the difference between effect size estimation and hypothesis testing?\n\nWhat options are out there for Bayesian hypothesis testing?\n\n\nWhat does a Bayesian model do that a frequentist model does not do?\n\nLicenses more flexible interpretations, since we’re not stuck in the binary of “reject the null or not”.\n\nWhy do some people prefer Bayesian analyses?\nWhy is Bayes currently up and coming? / Why are frequentist models the standard?"
   },
   {
     "objectID": "day2.html",
     "href": "day2.html",
-    "title": "Day 2 Home",
+    "title": "Learning objectives for Day 2",
     "section": "",
-    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-  },
-  {
-    "objectID": "day2.html#header-1",
-    "href": "day2.html#header-1",
-    "title": "Day 2 Home",
-    "section": "Header",
-    "text": "Header\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\nHeader\nLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+    "text": "What is the workflow for running a Bayesian analysis?\n\nHow do we decide what likelihood to use?\nHow do we decide what prior(s) to use?\n\nHow does the model work out the posterior?\nHow do we implement and fit a Bayesian model using brms?\nHow would we report the results in a publication?"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "A crash course in Bayesian inference",
     "section": "",
-    "text": "Lorem ipsum dolor sit amet.\n\nThanks to n loewen for help coming up with the workshop name.\nCopyright Elizabeth Pankratz 2023."
+    "text": "What you can expect from this two-day workshop:\n\nLearn the conceptual whys and wherefores of Bayesian inference.\nGet hands-on practice fitting Bayesian models in R using brms.\nHave some discussions as well as some individual work time.\n\nIntended audience:\n\nYou know how to use R and RStudio.\nYou are familiar with linear regression models and want to know how to think about them from a Bayesian perspective.\n\nTo be able to run the code we’ll use, please follow the set-up instructions here, and make sure everything is running before the workshop begins.\n\nThanks to n loewen for help coming up with the workshop name :)\nCopyright Elizabeth Pankratz 2023."
+  },
+  {
+    "objectID": "resources.html",
+    "href": "resources.html",
+    "title": "Elizabeth’s recommended resources",
+    "section": "",
+    "text": "For total newcomers to stats in R:\n\nMaterials from Stefano Coretta’s Statistical and Quantitative Methods course from this past winter (partly developed by yours truly!).\n\nFor people seeking intuitions and lots of detail presented approachably:\n\nStatistical Rethinking by Richard McElreath.\n\nThis book doesn’t use brms, but here’s a translation into brms + tidyverse by A Solomon Kurz.\n\nMcElreath has a series of free lectures too.\n\nFor people seeking more formalisation and math:\n\nAn Introduction to Bayesian Data Analysis for Cognitive Science by Bruno Nicenboim, Daniel Schad, and Shravan Vasishth.\n\nThis book is my stats bible ♥️\n\n\nAnd work I don’t have personal experience with but that others say is helpful:\n\nA Student’s Guide to Bayesian Statistics by Ben Lambert"
   }
 ]
