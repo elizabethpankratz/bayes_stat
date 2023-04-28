@@ -1,63 +1,70 @@
 [
   {
-    "objectID": "day1-1.html",
-    "href": "day1-1.html",
-    "title": "Day 1 subpage 1",
+    "objectID": "day1/day1-1.html",
+    "href": "day1/day1-1.html",
+    "title": "Bayesian reasoning",
     "section": "",
-    "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\ncars %>% \n  ggplot(aes(x = speed, y = dist)) +\n  geom_point()"
+    "text": "Began with a uniform prior:\n\n\n\n\n\n\n\nBegan with a prior saying we’re pretty certain this is a fair coin:\n\n\n\n\nHow both of them look after eight observations:\n\n\n\n\n\nBut if we do more than eight observations, and get up to 80/100:"
   },
   {
-    "objectID": "day1-2.html",
-    "href": "day1-2.html",
+    "objectID": "day1/day1-2.html",
+    "href": "day1/day1-2.html",
     "title": "Day 1 subpage 2",
     "section": "",
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
   },
   {
-    "objectID": "day1-recap.html",
-    "href": "day1-recap.html",
+    "objectID": "day1/day1-recap.html",
+    "href": "day1/day1-recap.html",
     "title": "Recap",
     "section": "",
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
   },
   {
-    "objectID": "day1.html",
-    "href": "day1.html",
+    "objectID": "day1/day1-recap.html#overall-workflow-for-a-bayesian-analysis",
+    "href": "day1/day1-recap.html#overall-workflow-for-a-bayesian-analysis",
+    "title": "Recap",
+    "section": "Overall workflow for a Bayesian analysis",
+    "text": "Overall workflow for a Bayesian analysis\n\nDecide on an appropriate likelihood function.\nDecide on priors for all parameters in the likelihood function.\nUse the model that results from this combination of likelihood and priors to derive the posterior distribution of each parameter.\nDraw inferences about your research question absed on the posterior distribution of the parameter of interest.\n\nWe’ll see this in action tomorrow!"
+  },
+  {
+    "objectID": "day1/learningobj.html",
+    "href": "day1/learningobj.html",
     "title": "Learning objectives for Day 1",
     "section": "",
     "text": "How does Bayesian reasoning work? \nWhat’s the anatomy of a Bayesian model?  \nHow do different priors influence the model’s estimates?  \nHow does Bayesian inference differ from frequentist inference?"
   },
   {
-    "objectID": "day2-1.html",
-    "href": "day2-1.html",
+    "objectID": "day2/day2-1.html",
+    "href": "day2/day2-1.html",
     "title": "Day 2 subpage 1",
     "section": "",
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
   },
   {
-    "objectID": "day2-2.html",
-    "href": "day2-2.html",
+    "objectID": "day2/day2-2.html",
+    "href": "day2/day2-2.html",
     "title": "Day 2 subpage 2",
     "section": "",
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
   },
   {
-    "objectID": "day2-recap.html",
-    "href": "day2-recap.html",
+    "objectID": "day2/day2-recap.html",
+    "href": "day2/day2-recap.html",
     "title": "Recap and take-aways",
     "section": "",
     "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
   },
   {
-    "objectID": "day2-recap.html#take-aways",
-    "href": "day2-recap.html#take-aways",
+    "objectID": "day2/day2-recap.html#take-aways",
+    "href": "day2/day2-recap.html#take-aways",
     "title": "Recap and take-aways",
     "section": "Take-aways",
     "text": "Take-aways\n\nPractice dealing with uncertainty.\nWhat does a frequentist model do that a Bayesian model does not do? NHST vs. effect size estimation.\n\nWhat is the difference between effect size estimation and hypothesis testing?\n\nWhat options are out there for Bayesian hypothesis testing?\n\n\nWhat does a Bayesian model do that a frequentist model does not do?\n\nLicenses more flexible interpretations, since we’re not stuck in the binary of “reject the null or not”.\n\nWhy do some people prefer Bayesian analyses?\nWhy is Bayes currently up and coming? / Why are frequentist models the standard?"
   },
   {
-    "objectID": "day2.html",
-    "href": "day2.html",
+    "objectID": "day2/learningobj.html",
+    "href": "day2/learningobj.html",
     "title": "Learning objectives for Day 2",
     "section": "",
     "text": "What is the workflow for running a Bayesian analysis?\n\nHow do we decide what likelihood to use?\nHow do we decide what prior(s) to use?\n\nHow does the model work out the posterior?\nHow do we implement and fit a Bayesian model using brms?\nHow would we report the results in a publication?"
