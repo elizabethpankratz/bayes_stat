@@ -1,0 +1,249 @@
+---
+title: "Building the model"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=7, fig.height=5, fig.retina=3,
+  out.width = "80%", fig.align = "center",
+  cache = FALSE,
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+
+library(tidyverse)
+library(patchwork)
+library(brms)
+
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_bw())
+
+acc <- read_csv('../data/acceptance.csv')
+```
+
+
+## Anatomy of a Bayesian model
+
+Recall from yesterday that a Bayesian model combines the **likelihood** of the data, given different hypotheses, with the **prior probabilities** of those hypotheses, to give us the **posterior probabilities** of how probable different hypotheses are, given the data.
+
+When we're doing Bayesian inference, **these hypotheses correspond to different parameter values**: different values that the model's coefficients can plausibly take on.
+The priors over these parameter values define how plausible we think different values are *a priori*.
+And the model will produce posteriors over the same parameter values that tell us what parameter values the model thinks are plausible, given the data.
+
+But before we get to the posterior, we'll need to define for our model a likelihood and some priors.
+We'll go through these now one by one.
+
+
+## Choosing a likelihood
+
+If you've done linear modelling before, you've probably already encountered this idea under the guise of the "model family".
+If you know that you can fit a basic linear model to continuous outcome data, but that you need a binomial/Bernoulli/logistic model for binary outcome data, then you know how to choose a likelihood function.
+
+**The likelihood function is selected based on the kinds of values that the outcome variable can take on.**
+Here are three common examples.
+
+### Gaussian (normal)
+
+A continuous variable, such as formant values in Hz, can be said to follow a Gaussian distribution (a.k.a. a normal distribution).
+A Gaussian distribution looks something like this:
+
+```{r plot-gaus}
+tibble(dat = rnorm(5*1e5)) %>% 
+  ggplot(aes(x = dat)) +
+  geom_density(fill = 'grey', alpha = 0.5) +
+  xlim(-5, 5) +
+  labs(
+    x = element_blank(),
+    y = 'Probability density',
+    title = 'Gaussian(0, 1)'
+  ) +
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        panel.grid = element_blank())
+```
+
+
+
+
+So if we were modelling Hz, we would use a Gaussian likelihood, and we could write it like this:
+
+$$
+Hz \sim Gaussian(\mu, \sigma)
+$$
+
+*"Hz is distributed according to a Gaussian distribution with mean $\mu$ and standard deviation $\sigma$."*
+
+($\mu$ and $\sigma$ are parameters that define the distribution's shape: where its mean is located, and how spread-out the distribution is around that mean, respectively.)
+
+If you would use a basic linear model, not a generalised linear model, in your analysis, you would choose a Gaussian likelihood.
+
+
+### Log-normal
+
+A continuous variable that's positive-only and right-skewed, such as reaction times, might follow a Gaussian distribution only once it's been log-transformed. 
+This means that, without any transformation, it follows a log-normal distribution.
+
+```{r plot-lognorm, warning=FALSE}
+lognorm_dat <- tibble(
+  dat = rlnorm(5*1e5, 0, 0.5),
+  logdat = log(dat))
+
+p_lognorm <- lognorm_dat %>% 
+  ggplot(aes(x = dat)) +
+  geom_density(fill = 'grey', alpha = 0.5) +
+  xlim(0, 5) +
+  labs(
+    x = element_blank(),
+    y = 'Probability density',
+    title = 'LogNormal(0, 0.5)'
+  ) +
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        panel.grid = element_blank())
+
+p_norm <- lognorm_dat %>% 
+  ggplot(aes(x = logdat)) +
+  geom_density(fill = 'grey', alpha = 0.5) +
+  xlim(-2, 2) +
+  labs(
+    x = element_blank(),
+    y = 'Probability density',
+    title = 'Logged LogNormal(0, 0.5)'
+  ) +
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        panel.grid = element_blank())
+  
+p_lognorm + p_norm
+```
+
+We write this as:
+
+$$
+RT \sim LogNormal(\mu, \sigma)
+$$
+
+*"RT is distributed according to a lognormal distribution with location $\mu$ and scale $\sigma$."*
+
+Equivalently, one could log-transform RTs and model them with a Gaussian likelihood:
+
+$$
+\log(RT) \sim Gaussian(\mu, \sigma)
+$$
+
+This is how it's typically done in frequentist circles, but Bayesian models make it just as easy to use a lognormal likelihood as a Gaussian one.
+
+
+### Bernoulli
+
+If the outcome is binary (e.g., 0/1, success/failure, grammatical/ungrammatical, English/French, etc.), then we assume that it comes from a Bernoulli distribution defined by $\theta$, the probability of success.
+
+$$
+success \sim Bernoulli(\theta)
+$$
+
+*"Success is distributed according to a Bernoulli distribution with probability $\theta$."*
+
+Our model today will have a Bernoulli likelihood, since our data is binary: 0 if the participant rejected the sentence they saw, 1 if they accepted it.
+
+::: {.callout-tip collapse="true"}
+#### How can a probability produce binary outcomes?
+
+Imagine a flip of a fair coin, where the probability of getting heads is $\theta = 0.5$.
+
+If you flip the coin ten times, you'll get ten observations of binary outcomes (heads/tails), and probably about half of them will be heads.
+
+(If it's not a fair coin, you might get nine heads and one tail from, e.g., $\theta = 0.9$.)
+:::
+
+### Other likelihoods
+
+Other likelihoods you may encounter include Poisson (for count data) or beta (for data in [0, 1]), and there are certainly more besides.
+But for most use cases in experimental linguistics, the three highlighted above will be ones we reach for.
+
+
+## Begin building the model
+
+The next step is to think about what priors our model needs, and how they might be defined.
+
+You saw that each of those likelihood functions above contains parameters that define their shape: $\mu$, $\sigma$, $\theta$.
+**Every parameter in a Bayesian model needs to have a prior** that tells the model which values are a priori plausible for that parameter to take on.
+
+In this section, we build the model up bit by bit.
+This process will show us how many parameters our model has, and therefore what priors the model needs.
+
+To build up the model, we'll start off by defining the model's likelihood.
+The likelihood is the closest part of the model to the outcome, so it's the best starting point for figuring out a model that could plausibly have generated the outcome we observe.
+
+We determined which likelihood we need above: acceptance $acc$ follows a Bernoulli distribution.
+
+$$acc \sim Bernoulli(\theta)$$
+
+We're interested in modelling what affects $\theta$, the probability of accepting a sentence.
+In other words, we want $\theta$ to be able to take on different values, depending on the condition participants were in and what kinds of sentences they were seeing.
+$\theta$ should be high in a certain situation if participants are more likely to accept sentences, and it should be low in another situation if they are more likely to reject them.
+
+OK, well, more precisely: we actually want $logit(\theta)$, the *log-odds* of accepting a sentence, to be able to take on different values.
+Converting probabilities (bounded between 0 and 1) into log-odds (unbounded) moves our estimation into a continuous space in which a line, also a continuous thing, can reasonably be fit.
+(If you haven't encountered this concept before, check out [these slides](https://stefanocoretta.github.io/sqmb/slides/w07/#1) later.)
+
+In a linear modelling approach, we allow $logit(\theta)$ to take on different values depending on the values of our predictors ($cond$ for condition, $sent$ for sentence) and their interaction ($cond \cdot sent$) by setting it equal to this linear expression:
+
+$$
+logit(\theta) = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\beta_3 \cdot cond \cdot sent)
+$$
+
+(If you're curious about why interactions are represented this way, see [these slides](https://stefanocoretta.github.io/sqmb/slides/w08/#1).)
+
+There's suddenly a lot of Greek here!
+$\alpha$, $\beta_1$, $\beta_2$, and $\beta_3$ are the parameters that we want our model to estimate.
+You might recognise $\alpha$ as the line's intercept, and all the $\beta$s are the slopes, the effects, the coefficients of our predictors.
+We will need priors for all of these parameters.
+
+What do priors do?
+They tell the model which values for each parameter we think are plausible, and they do this by describing how these parameter values are distributed.
+So, formally(ish), we'll end up with a model that looks like this:
+
+$$
+\begin{aligned}
+\text{acc} & \sim Bernoulli(\theta) \\
+logit(\theta) & = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\beta_3 \cdot cond \cdot sent)\\
+\alpha & \sim \text{something!} \\
+\beta_1 & \sim \text{something!} \\
+\beta_2 & \sim \text{something!} \\
+\beta_3 & \sim \text{something!} \\
+\end{aligned}
+$$
+
+Finding suitable "something"s is the focus of the next section.
+
+
+## Choosing priors
+
+There is a *lot* of literature on how to choose appropriate priors, and many different schools of thought.
+
+A couple different kinds of priors you might encounter:
+
+- **Informative priors:** Priors that are quite narrow, reflecting more *a priori* certainty about the values that we believe to be plausible. These priors might come from, e.g.:
+  - Domain knowledge elicited from experts.
+  - Effect size estimates from one's own previous research or from meta-analyses.
+- **Weakly regularising priors:** Priors that are fairly broad, reflecting *a priori* uncertainty about plausible parameter values. They rule out impossibly large values (e.g., RTs in the millions), but are uncertain enough that the data has much more of an influence on the posterior than they do.
+
+I personally prefer to use weakly regularising priors, because (a) there often isn't a ton of domain knowledge available for the kinds of studies I'm running, and (b) weaker priors are not as alarming to researchers trained in frequentism, and these are generally the people who review our papers.
+
+
+
+### Consider the space the model is fit in
+
+
+### Prior predictive checks
+
+
+
+
+## Summary
+
+- **Likelihood:** Bernoulli, since our data is binary (0 and 1 are our outcomes).
+- **Priors:** Weakly regularising priors that don't restrict the model's estimates, following X's Law.

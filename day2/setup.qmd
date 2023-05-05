@@ -1,0 +1,88 @@
+---
+title: "Getting set up"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=7, fig.height=5, fig.retina=3,
+  out.width = "80%", fig.align = "center",
+  cache = FALSE,
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+
+library(tidyverse)
+
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_bw())
+
+acc <- read_csv('../data/acceptance.csv')
+```
+
+
+## Download files
+
+I've created a pre-loaded directory structure for this workshop that you can download.
+(If you're having internet issues, ask me for the version on USB.)
+
+1. Right-click on [this link](data/bayes_workshop.zip) and download the zip file.
+2. Unzip it and relocate the directory to wherever you want on your computer.
+3. To open the R project, click on the file `bayes_workshop.Rproj` (you might not see the `.Rproj` part—then just click on the thing that says `bayes_workshop`). This will open the R project within RStudio; you'll be able to tell you're in the R project because at the top right of your RStudio window, you'll see its name:
+
+<center>
+![](../imgs/rproj.png)
+</center>
+<br>
+
+4. In the Files pane at the bottom right of RStudio, click on `code/` and open the file called `workshop.Rmd`.
+
+R projects can be very helpful for creating reproducible analyses.
+For one, they let you set RStudio's working directory to the project directory (i.e., the directory where the `.Rproj` file lives), and this makes reading in data that also lives within the project directory very easy.
+
+You can see this at work in the R notebook I've prepared.
+
+
+## Open `workshop.Rmd`
+
+`workshop.Rmd` is where you'll build up the code to fit your Bayesian model.
+
+First up, make sure that the code that's already in `workshop.Rmd` runs as it should.
+**Execute all the code chunks in this file.**
+
+If everything is running correctly, you should see (1) no errors, (2) six lines of data, and (3) a plot that looks like this:
+
+```{r plot-data}
+acc %>% 
+  group_by(ppt_id, condition, sentence_type) %>% 
+  summarise(propn_accepted = mean(sentence_accepted)) %>% 
+  ggplot(aes(x = sentence_type, y = propn_accepted, fill = sentence_type, colour = sentence_type)) +
+  geom_violin(alpha = 0.5) +
+  geom_jitter(alpha = 0.5, width = 0.1) +
+  facet_wrap(~ condition) +
+  ylim(-0.05, 1.05) +
+  labs(y = 'Proportion sentences accepted',
+       x = 'Sentence type') +
+  theme(legend.position = 'none') +
+  scale_x_discrete(labels = c('Case marking', 'Word order')) +
+  NULL
+```
+
+If you do, then you're good to go!
+If not, let me know and we can troubleshoot.
+
+
+## The data we'll use
+
+This data comes from a recent study run by Aislinn Keogh and Elizabeth Pankratz.
+We wanted to know whether the type of experimental task that participants do (a comprehension task vs. a production task) can affect whether participants learn a word order grammar or a case marking grammar for an artificial language where both analyses are possible.
+(For more detail on the project, come see our virtual poster at CogSci this summer and stay tuned for our preprint 😉)
+
+We'll look at data from this experiment's judgement phase, where participants are shown novel sentences that are constructed using *either* the word-order grammar *or* the case-marking grammar—sentences that are not compatible with both analyses.
+If participants learned one grammar, they should accept sentences constructed with that grammar and reject the others.
+In particular, we wanted to know whether participants in the production group would be more likely to accept case-marking sentences than participants in the comprehension group.
+
+The plot you see in `workshop.Rmd` shows that this doesn't seem to be the case—in fact, production participants reject case-marking sentences even more than comprehension participants do!
+
+Let's have a look at how to model this data using `brms`.
