@@ -73,9 +73,10 @@ If you do, then you're good to go!
 If not, let me know and we can troubleshoot.
 
 
+
 ## The data we'll use
 
-This data comes from a recent study run by Aislinn Keogh and Elizabeth Pankratz.
+This data is a subset of the full dataset from a recent study run by Aislinn Keogh and Elizabeth Pankratz.
 We wanted to know whether the type of experimental task that participants do (a comprehension task vs. a production task) can affect whether participants learn a word order grammar or a case marking grammar for an artificial language where both analyses are possible.
 (For more detail on the project, come see our virtual poster at CogSci this summer and stay tuned for our preprint 😉)
 
@@ -97,7 +98,7 @@ To set up the predictors we'll use, copy and run the following code in your R no
 ```{r echo=TRUE}
 acc <- acc %>% 
   mutate(
-    cond = ifelse(condition == 'comprehension', -0.5, 0.5),
+    cond = ifelse(condition == 'Comprehension', -0.5, 0.5),
     sent = ifelse(sentence_type == 'case_marking', -0.5, 0.5),
     condsent = cond * sent * 2
   )

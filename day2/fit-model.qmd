@@ -1,5 +1,5 @@
 ---
-title: "Building the model"
+title: "Fitting the model"
 ---
 
 ```{r setup, include=FALSE}
@@ -16,612 +16,32 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(patchwork)
 library(brms)
+library(bayesplot)
 
 options(dplyr.summarise.inform = FALSE)
 theme_set(theme_bw())
 
-acc <- read_csv('../data/acceptance.csv')
-```
-
-
-## Anatomy of a Bayesian model
-
-Recall from yesterday that a Bayesian model combines the **likelihood** of the data, given different hypotheses, with the **prior probabilities** of those hypotheses, to give us the **posterior probabilities** of how probable different hypotheses are, given the data.
-
-When we're doing Bayesian inference, **these hypotheses correspond to different parameter values**: different values that the model's coefficients can plausibly take on.
-The priors over these parameter values define how plausible we think different values are *a priori*.
-And the model will produce posteriors over the same parameter values that tell us what parameter values the model thinks are plausible, given the data.
-
-But before we get to the posterior, we'll need to define for our model a likelihood and some priors.
-We'll start with the likelihood because it's the closest part of the model to the outcome, so it's the best starting point for figuring out a model that could plausibly have generated the outcome we observe.
-And it'll also affect how our priors will look later.
-
-
-## Choosing a likelihood
-
-If you've done linear modelling before, you've probably already encountered this idea under the guise of the "model family".
-If you know that you can fit a basic linear model to continuous outcome data, but that you need a binomial/Bernoulli/logistic model for binary outcome data, then you know how to choose a likelihood function.
-
-**The likelihood function is selected based on the kinds of values that the outcome variable can take on.**
-Here are three common examples.
-
-### Gaussian (normal)
-
-A continuous variable, such as formant values in Hz, can be said to follow a Gaussian distribution (a.k.a. a normal distribution).
-A Gaussian distribution looks something like this:
-
-```{r plot-gaus}
-tibble(dat = rnorm(5*1e5)) %>% 
-  ggplot(aes(x = dat)) +
-  geom_density(fill = 'grey', alpha = 0.5) +
-  xlim(-5, 5) +
-  labs(
-    x = element_blank(),
-    y = 'Probability density',
-    title = 'Gaussian(0, 1)'
-  ) +
-  theme(axis.ticks.y = element_blank(),
-        axis.text.y = element_blank(),
-        panel.grid = element_blank())
-```
-
-
-
-
-So if we were modelling Hz, we would use a Gaussian likelihood, and we could write it like this:
-
-$$
-Hz \sim Gaussian(\mu, \sigma)
-$$
-
-*"Hz is distributed according to a Gaussian distribution with mean $\mu$ and standard deviation $\sigma$."*
-
-($\mu$ and $\sigma$ are parameters that define the distribution's shape: where its mean is located, and how spread-out the distribution is around that mean, respectively.)
-
-If you would use a basic linear model, not a generalised linear model, in your analysis, you would choose a Gaussian likelihood.
-
-
-### Log-normal
-
-A continuous variable that's positive-only and right-skewed, such as reaction times, might follow a Gaussian distribution only once it's been log-transformed. 
-This means that, without any transformation, it follows a log-normal distribution.
-
-```{r plot-lognorm, warning=FALSE}
-lognorm_dat <- tibble(
-  dat = rlnorm(5*1e5, 0, 0.5),
-  logdat = log(dat))
-
-p_lognorm <- lognorm_dat %>% 
-  ggplot(aes(x = dat)) +
-  geom_density(fill = 'grey', alpha = 0.5) +
-  xlim(0, 5) +
-  labs(
-    x = element_blank(),
-    y = 'Probability density',
-    title = 'LogNormal(0, 0.5)'
-  ) +
-  theme(axis.ticks.y = element_blank(),
-        axis.text.y = element_blank(),
-        panel.grid = element_blank())
-
-p_norm <- lognorm_dat %>% 
-  ggplot(aes(x = logdat)) +
-  geom_density(fill = 'grey', alpha = 0.5) +
-  xlim(-2, 2) +
-  labs(
-    x = element_blank(),
-    y = 'Probability density',
-    title = 'Logged LogNormal(0, 0.5)'
-  ) +
-  theme(axis.ticks.y = element_blank(),
-        axis.text.y = element_blank(),
-        panel.grid = element_blank())
-  
-p_lognorm + p_norm
-```
-
-We write this as:
-
-$$
-RT \sim LogNormal(\mu, \sigma)
-$$
-
-*"RT is distributed according to a lognormal distribution with location $\mu$ and scale $\sigma$."*
-
-Equivalently, one could log-transform RTs and model them with a Gaussian likelihood:
-
-$$
-\log(RT) \sim Gaussian(\mu, \sigma)
-$$
-
-This is how it's typically done in frequentist circles, but Bayesian models make it just as easy to use a lognormal likelihood as a Gaussian one.
-
-
-### Bernoulli
-
-If the outcome is binary (e.g., 0/1, success/failure, grammatical/ungrammatical, English/French, etc.), then we assume that it comes from a Bernoulli distribution defined by $\theta$, the probability of success.
-
-$$
-success \sim Bernoulli(\theta)
-$$
-
-*"Success is distributed according to a Bernoulli distribution with probability $\theta$."*
-
-Our model today will have a Bernoulli likelihood, since our data is binary: 0 if the participant rejected the sentence they saw, 1 if they accepted it.
-
-
-::: {.callout-tip collapse="true"}
-#### Intuition: How can a probability produce binary outcomes?
-
-Imagine a flip of a fair coin, where the probability of getting heads is $\theta = 0.5$.
-In Bernoulli terms, the outcome representing "success" is generated with this probability $\theta$, and the outcome representing "failure", with probability $1 - \theta$.
-
-So, if you flip a fair coin ten times, you'll get ten observations of binary outcomes (heads/tails), and probably about half of them will be heads ("success").
-:::
-
-
-### Other likelihoods
-
-Other likelihoods you may encounter include Poisson (for count data) or beta (for data in [0, 1]), and there are certainly more besides.
-But for most use cases in experimental linguistics, the three highlighted above will be ones we reach for.
-
-
-## Begin building the model
-
-Now that we have a likelihood, the next step is to think about what priors our model needs, and how they might be defined.
-
-You saw that each of those likelihood functions above contains parameters that define their shape: $\mu$, $\sigma$, $\theta$.
-**Every parameter in a Bayesian model needs to have a prior** that tells the model which values are a priori plausible for that parameter to take on.
-
-In this section, we build the model up bit by bit.
-This process will show us how many parameters our model has, and therefore what priors the model needs.
-We'll start with the likelhood.
-
-To build up the model, we'll start off by defining the model's likelihood.
-
-
-We determined which likelihood we need above: acceptance $acc$ follows a Bernoulli distribution.
-
-$$acc \sim Bernoulli(\theta)$$
-
-We're interested in modelling what affects $\theta$, the probability of accepting a sentence.
-In other words, we want $\theta$ to be able to take on different values, depending on the condition participants were in and what kinds of sentences they were seeing.
-$\theta$ should be high in a certain situation if participants are more likely to accept sentences, and it should be low in another situation if they are more likely to reject them.
-
-OK, well, more precisely: we actually want $logit(\theta)$, the *log-odds* of accepting a sentence, to be able to take on different values.
-Converting probabilities (bounded between 0 and 1) into log-odds (unbounded) moves our estimation into a continuous space in which a line, also a continuous thing, can reasonably be fit.
-
-::: {.callout-tip collapse="true"}
-#### What are log-odds and why do we use them?
-
-<!-- TODO  -->
-<!-- (If you haven't encountered this concept before, check out [these slides](https://stefanocoretta.github.io/sqmb/slides/w07/#1) later.) -->
-
-:::
-
-
-In a linear modelling approach, we allow $logit(\theta)$ to take on different values depending on the values of our predictors ($cond$ for condition, $sent$ for sentence) and their interaction ($cond \cdot sent$) by setting it equal to this linear expression:
-
-$$
-logit(\theta) = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\beta_3 \cdot cond \cdot sent)
-$$
-
-
-There's a lot of Greek here!
-$\alpha$, $\beta_1$, $\beta_2$, and $\beta_3$ are the parameters that we want our model to estimate.
-You might recognise $\alpha$ as the line's intercept, and all the $\beta$s are the slopes, the effects, the coefficients of our predictors.
-We will need priors for all of these parameters.
-
-What do priors do?
-They tell the model which values for each parameter we think are plausible, and they do this by describing how these parameter values are distributed.
-So, formally(ish), we'll end up with a model that looks like this:
-
-$$
-\begin{aligned}
-\text{acc} & \sim Bernoulli(\theta) \\
-logit(\theta) & = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\beta_3 \cdot cond \cdot sent)\\
-\alpha & \sim \text{something} \\
-\beta_1 & \sim \text{something} \\
-\beta_2 & \sim \text{something} \\
-\beta_3 & \sim \text{something} \\
-\end{aligned}
-$$
-
-Finding suitable "something"s is the focus of the next section.
-
-
-## Choosing priors
-
-There is a *lot* of literature on how to choose appropriate priors, and many different schools of thought.
-
-Different kinds of priors you might encounter:
-
-- **Informative priors:** Priors that are quite narrow, reflecting more *a priori* certainty about the values that we believe to be plausible. These priors might come from, e.g.:
-  - Domain knowledge elicited from experts.
-  - Effect size estimates from one's own previous research or from meta-analyses.
-- **Weakly regularising priors:** Priors that are fairly broad, reflecting *a priori* uncertainty about plausible parameter values. They rule out impossibly large values (e.g., RTs in the millions), but are uncertain enough that the data has much more of an influence on the posterior than they do.
-- **brms' default priors:** If you don't specify any priors when you fit your model, brms will use its defaults. (You can see what these are with the command `brms::get_priors(mymodel)`.)
-
-I personally prefer to use weakly regularising priors, because (a) there often isn't lots of domain knowledge available for the kinds of studies I'm running, and (b) weaker priors are less philosophically alarming to researchers trained in frequentism, and these are generally the people who review our papers.
-
-
-::: {.callout-tip collapse="true"}
-#### Cromwell's Rule
-
-This general preference for more liberal, less restrictive priors is also known as Cromwell’s Rule.
-The Cromwell in question is Oliver Cromwell, an English general who led a campaign against the Scottish army in 1650 and, in a letter to the Church of Scotland, wrote, “I beseech you, in the bowels of Christ, consider it possible that you are mistaken” (Jackman, 2009: 18).
-Lindley (1985), who named the rule, did so because wider priors allow us this possibility.
-
-
-**References:**
-
-Jackman, Simon. (2009). *Bayesian analysis for the social sciences.* London: John Wiley & Sons, Ltd.
-
-Lindley, Dennis V. (1985). *Making decisions.* 2nd ed. London: John Wiley & Sons, Ltd.
-
-:::
-
-
-
-Let's walk through how to come up with weakly regularising priors for $\alpha$ and the $\beta$s in the model above.
-
-
-### Consider order of magnitude/model space
-
-**TLDR: Your priors must match the order of magnitude of the space the model is fit in.**
-
-If the model's coefficient estimates are interpretable using the same units as the outcome (e.g., if you're using a Gaussian likelihood), then we can say that the model is "fit in the outcome space".
-If your model is fit in the outcome space, then you need to think about what **order of magnitude** our outcome variable has.
-
-- For example, if your outcome is raw reaction time, then your effects might be in the hundreds (of milliseconds).
-- But if your outcome is log reaction time, then your effects are probably in the single digits (of log units).
-
-A weak prior on the log scale is an incredibly restrictive prior on the millisecond scale.
-So the prior has to match the order of magnitude of the outcome.
-
-If the model is *not* fit in the outcome space—i.e., if the outcome is transformed into a different space, and then the linear model is fit there—we need to know what space the model is fit in.
-This is because **the priors have to be on the transformed scale,** not the outcome scale.
-
-In our case, our model has a logit link function that transforms probabilities into log-odds, and then the linear expression is fit in log-odds space.
-That means our priors have to be **on the log-odds scale**.
-
-
-
-### A prior for $\alpha$
-
-$\alpha$ represents the intercept of our linear model.
-It is the outcome, in log-odds space, when all predictors equal zero.
-Because we'll code up our predictors with $\pm$0.5 sum coding, our $\alpha$ represents the grand mean of the outcome.
-
-Our goal: to come up with a weakly regularising prior that allows the outcome's grand mean to take on basically any value.
-And for the intercept in particular, it's useful to consider how this prior translates to probability space.
-
-Let's have a look at three different log-odds priors (in the left panels), and how they look once back-transformed into probability space (right panels).
-The higher the probability density, the more plausible the model will consider those values to be.
-
-```{r alpha-prior-plots, fig.height = 3}
-plot_logodds_to_prob <- function(logodds_data, distrib_str){
-  # logodds_data: vector of numbers in log-odds space
-  # distrib_str: a string that names the log-odds distribution (for plot title)
-  
-  facet_labels <- c(
-    log_odds = 'In log-odds space',
-    prob     = 'In probability space'
+acc <- read_csv('../data/acceptance.csv') %>% 
+    mutate(
+    cond = ifelse(condition == 'Comprehension', -0.5, 0.5),
+    sent = ifelse(sentence_type == 'case_marking', -0.5, 0.5),
+    condsent = cond * sent * 2
   )
-  tibble(log_odds = logodds_data) %>%
-    mutate(prob = plogis(log_odds)) %>% 
-    pivot_longer(cols=everything(), names_to = 'scale', values_to = 'sim') %>% 
-    ggplot(aes(x=sim)) +
-    facet_wrap(~ scale, scales = 'free',
-               labeller = as_labeller(facet_labels)) +
-    geom_density(fill='grey', alpha=.5) +
-    labs(
-      title = paste(
-        distrib_str, 
-        'in log-odds space and transformed to probability space'
-      ),
-      x = element_blank(),
-      y = 'Probability density'
-    ) +
-    theme(axis.ticks.y = element_blank(),
-          axis.text.y = element_blank(),
-          panel.grid = element_blank()) +
-    NULL
-}
-
-plot_logodds_to_prob(rnorm(100000, 0, 1), 'Normal(0, 1)')
-plot_logodds_to_prob(rnorm(100000, 0, 1.5), 'Normal(0, 1.5)')
-plot_logodds_to_prob(rnorm(100000, 0, 2), 'Normal(0, 2)')
 ```
 
 
-::: {.callout-tip collapse="true"}
-#### ggplot code to generate those plots
+On this page, we'll focus on:
 
-Here's the function that generates these log-odds vs. probability plots, if you want to have a play yourself:
+1. **Fitting the model** (yay!)
+2. **A couple diagnostics** for checking model convergence.
+3. **Posterior predictive checks:** How well does the model capture the generative process behind the data?
 
-```{r eval=FALSE, include=TRUE, echo=TRUE}
-plot_logodds_to_prob <- function(logodds_data, distrib_str){
-  # logodds_data: vector of numbers in log-odds space
-  # distrib_str: a string description of the log-odds distribution (for plot title)
-  
-  facet_labels <- c(
-    log_odds = 'In log-odds space',
-    prob     = 'In probability space'
-  )
-  tibble(log_odds = logodds_data) %>%
-    mutate(prob = plogis(log_odds)) %>% 
-    pivot_longer(cols=everything(), names_to = 'scale', values_to = 'sim') %>% 
-    ggplot(aes(x=sim)) +
-    facet_wrap(~ scale, scales = 'free',
-               labeller = as_labeller(facet_labels)) +
-    geom_density(fill='grey', alpha=.5) +
-    labs(
-      title = paste(
-        distrib_str, 
-        'in log-odds space and transformed to probability space'
-      ),
-      x = element_blank(),
-      y = 'Probability density'
-    ) +
-    theme(axis.ticks.y = element_blank(),
-          axis.text.y = element_blank(),
-          panel.grid = element_blank()) +
-    NULL
-}
-
-# Example usage:
-plot_logodds_to_prob(rnorm(100000, 0, 2), 'Normal(0, 2)')
-```
-
-:::
+Then on the next page, we'll use what we learned yesterday about how to interpret posterior probabilities to finally interpret and report the model's results.
 
 
+## Our model
 
-What looks like an unassuming normal distribution in log-odds space can get pretty wacky in probability space.
-If we used $\alpha \sim$ Normal(0, 2), then the model would think that probabilities of success near 0 and 1 are more plausible than probabilities around 0.5.
-And if we used $\alpha \sim$ Normal(0, 1), then the model would think that those same extreme probabilities are very implausible, compared to the more moderate values.
-What we want is something in between.
-
-When Normal(0, 1.5) is transformed into probability space, it yields a decently uniform distribution: basically any probability of success is *a priori* equally plausible.
-
-We like this permissiveness, so this will be our prior for $\alpha$.
-Our model becomes:
-
-$$
-\begin{aligned}
-\text{acc} & \sim Bernoulli(\theta) \\
-logit(\theta) & = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\beta_3 \cdot cond \cdot sent)\\
-\alpha & \sim Normal(0, 1.5) \\
-\beta_1 & \sim \text{something} \\
-\beta_2 & \sim \text{something} \\
-\beta_3 & \sim \text{something} \\
-\end{aligned}
-$$
-
-
-
-### A prior for the $\beta$s
-
-The $\beta$s represent the effects of interest—the main effects of $cond$ and $sent$, and the effect of their interaction—in log-odds space.
-Note: I generally use the same weakly regularising prior for all the $\beta$s, especially if they're all on the same scale or coded the same way.
-
-We found a decent prior for the intercept, $\alpha$, by considering the mapping from log-odds to probability space.
-There's no direct mapping for the $\beta$s in the same way.
-This is because the $\beta$s are added to the intercept in log-odds space; they never surface directly into the outcome space themselves, so it doesn't make sense to think of them in terms of probabilities.
-
-That $\beta$s don't stand alone makes it a bit harder to reason about what priors are sensible.
-How do we get around this?
-Enter **prior predictive checks**.
-
-
-#### Prior predictive checks in brms
-
-The basic idea is that we can capitalise on Bayesian models' capacity as generative models to check whether different priors generate sensible data.
-
-A toy example to illustrate the principle:
-
-- Suppose that our likelihood is a normal distribution with mean $\mu$ and standard deviation $\sigma$: $Normal(\mu, \sigma)$.
-- Suppose that $\mu \sim Normal(0, 1.5)$ and $\sigma \sim Uniform(0, 5)$; these are the priors.
-- To get one prior predictive observation: 
-  - For $\mu$, sample one value $a$ from $Normal(0, 1.5)$.
-  - For $\sigma$, sample one value $b$ from $Uniform(0, 5)$.
-  - These together define the likelihood $Normal(a, b)$. Sample one value from this distribution.
-- Do this a vast number of times to yield a prior predictive distribution.
-
-Luckily, brms automates this for us!
-We'll set up models with a few different priors and use them to generate fake data.
-Then we'll look at that fake data and see whether it looks fair.
-For us, "fair" means not too restricted—we want permissive priors (see Cromwell's Rule above).
-This process is called "prior prediction" or "doing prior predictive checks".
-(We'll also do "posterior predictive checks" after fitting the model—stay tuned.)
-
-Here's the basic template for how to set up a prior predictive model in brms using the function `brm()`.
-
-```r
-mymodel <- brm(myoutcome ~ mypredictor + (1 | mygroup),
-               data = mydata,
-               family = bernoulli(),
-               prior = c(
-                 prior(normal(0, 1.5), class = Intercept),
-                 prior(SOMETHING, class = b)
-               ),
-               backend = 'cmdstanr',
-               sample_prior = 'only')
-```
-
-
-- The first argument is the model formula in `lme4` syntax.
-- The `data=` argument tells `brm()` where to get the data.
-- The `family=` argument defines the model family (`bernoulli()`, `gaussian()`, etc.).
-- The `prior=` argument defines the priors that the model will use. If there is no `prior=` argument, the model will use the default priors.
-- The line `backend = 'cmdstanr'` argument specifies that the model will be fit using CmdStan.
-- The line `sample_prior = 'only'` is what makes this model into a *prior* predictive model: it ignores the data and uses only the priors to estimate the posteriors (basically just reproducing the priors). Removing this line will cause the model to take the data into account when estimating posteriors, and we'll do this when we properly fit the model.
-
-
-Copy the template above to fit a prior predictive model with the formula `sentence_accepted ~ cond + sent + condsent` and the very-wide prior `normal(0, 10)` for `class = b` ("b" stands for "beta"), using data from `acc`.
-Name the model `priorpred10`.
-
-::: {.callout-tip collapse="true"}
-#### Bayesian hierarchical models
-
-In an IRL version of this analysis, we'd of course also include group-level effects (what frequentists call "random effects").
-For ease of exposition, we'll skip those for now and just treat all data points as independent.
-
-If you want to learn how to do hierarchical models in a Bayesian framework, see, e.g., [here](https://vasishth.github.io/bayescogsci/book/ch-hierarchical.html).
-
-:::
-
-
-```{r echo=TRUE, eval=FALSE}
-priorpred10 <- ...
-```
-
-
-```{r}
-priorpred10 <- brm(sentence_accepted ~ cond + sent + condsent,
-               data = acc,
-               family = bernoulli(),
-               prior = c(
-                 prior(normal(0, 1.5), class = Intercept),
-                 prior(normal(0, 10), class = b)
-               ),
-               backend = 'cmdstanr',
-               file = '../data/models/priorpred10',
-               sample_prior = 'only')
-```
-
-This model will estimate posteriors based on the priors only, ignoring all the data.
-Now we'll use these posteriors to generate some new data, the way the toy example above did, and see whether it look reasonable.
-
-Generating predictive data is such a common thing to do that brms comes with a useful function that helps us do it graphically: `pp_check()` (documentation [here](https://paul-buerkner.github.io/brms/reference/pp_check.brmsfit.html)).
-
-Using your model `priorpred10`, run the following code.
-You should get a plot something like the one below.
-
-```{r echo=TRUE, message=FALSE}
-pp_check(priorpred10,      # The model object
-         type = 'stat',    # Apply some summary statistic to generated data
-         stat = mean,      # Specifically, apply the function mean()
-         prefix = 'ppd') + # Hide observed data ("ppd" = prior predictive distribution)
-  labs(x = 'theta',        # We can add layers to the ggplot object!
-       title = 'Prior predictive distribution means with beta ~ Normal(0, 10)')
-```
-
-
-This plot is telling us that the mean probability of success (i.e., of accepting a sentence) in the prior predictive distributions is nearly always around 0.5, and it's very unlikely to have probabilities of success above or below that.
-This doesn't look great to us—we want a much broader and more even spread of means in the data that our model generates.
-Why?
-Because we want our model to be equally compatible with many different outcomes, not skewed like this one is.
-
-So let's try a few more priors.
-Adapt the code above to fit a few more prior predictive models using these priors:
-
-- $\beta \sim Normal(0, 5)$
-- $\beta \sim Normal(0, 2)$
-- $\beta \sim Normal(0, 1)$
-- $\beta \sim Normal(0, 0.1)$
-
-(and any others you want to try!)
-
-For each model, generate a summary histogram using `pp_check()`.
-Which of these histograms produces the most even-looking distribution?
-
-Once you have your own solution, uncollapse this box to have a look at mine:
-
-::: {.callout-note collapse="true"}
-#### Prior predictive distributions
-
-
-```{r}
-priorpred1 <- brm(sentence_accepted ~ cond + sent + condsent,
-               data = acc,
-               family = bernoulli(),
-               prior = c(
-                 prior(normal(0, 1.5), class = Intercept),
-                 prior(normal(0, 1), class = b)
-               ),
-               backend = 'cmdstanr',
-               file = '../data/models/priorpred1',
-               sample_prior = 'only')
-
-priorpred2 <- brm(sentence_accepted ~ cond + sent + condsent,
-               data = acc,
-               family = bernoulli(),
-               prior = c(
-                 prior(normal(0, 1.5), class = Intercept),
-                 prior(normal(0, 2), class = b)
-               ),
-               backend = 'cmdstanr',
-               file = '../data/models/priorpred2',
-               sample_prior = 'only')
-
-priorpred5 <- brm(sentence_accepted ~ cond + sent + condsent,
-               data = acc,
-               family = bernoulli(),
-               prior = c(
-                 prior(normal(0, 1.5), class = Intercept),
-                 prior(normal(0, 5), class = b)
-               ),
-               backend = 'cmdstanr',
-               file = '../data/models/priorpred5',
-               sample_prior = 'only')
-
-priorpred01 <- brm(sentence_accepted ~ cond + sent + condsent,
-               data = acc,
-               family = bernoulli(),
-               prior = c(
-                 prior(normal(0, 1.5), class = Intercept),
-                 prior(normal(0, 0.1), class = b)
-               ),
-               backend = 'cmdstanr',
-               file = '../data/models/priorpred01',
-               sample_prior = 'only')
-```
-
-```{r message=FALSE}
-pp_01 <- pp_check(priorpred01,     
-         type = 'stat',
-         stat = mean,     
-         prefix = 'ppd') +
-  labs(x = 'theta',
-       title = 'beta ~ Normal(0, 0.1)') +
-  theme(legend.position = 'none')
-
-pp_1 <- pp_check(priorpred1,     
-         type = 'stat',
-         stat = mean,     
-         prefix = 'ppd') +
-  labs(x = 'theta',
-       title = 'beta ~ Normal(0, 1)') +
-  theme(legend.position = 'none')
-
-pp_2 <- pp_check(priorpred2,     
-         type = 'stat',
-         stat = mean,     
-         prefix = 'ppd') +
-  labs(x = 'theta',
-       title = 'beta ~ Normal(0, 2)') +
-  theme(legend.position = 'none')
-
-pp_5 <- pp_check(priorpred5,     
-         type = 'stat',
-         stat = mean,     
-         prefix = 'ppd') +
-  labs(x = 'theta',
-       title = 'beta ~ Normal(0, 5)') +
-  theme(legend.position = 'none')
-
-(pp_5 + pp_2) /
-(pp_1 + pp_01)
-```
-
-The spread, perhaps counterintuitively, is most even with the narrowest prior, and gets progressively more skewed as the prior gets more variable.
-We do want a fairly even spread, but we can use our domain knowledge to say that effects on the order of $Normal(0, 0.1)$ are probably too small to be realistic.
-(By definition, 95% of these will fall between [–0.2, 0.2] log-odds—that's nothing!)
-
-The next-best prior is $Normal(0, 1)$: broader, but still decently uniform posterior predictive means.
-This is the prior we'll use, and now our final model is:
+In mathematical notation, the model we'll fit is the following.
 
 $$
 \begin{aligned}
@@ -634,19 +54,134 @@ logit(\theta) & = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\beta_
 \end{aligned}
 $$
 
-:::
+
+In brms notation, it looks like this:
+
+```{r eval=FALSE, echo=TRUE}
+acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
+               data = acc,
+               family = bernoulli(),
+               prior = c(
+                 prior(normal(0, 1.5), class = Intercept),
+                 prior(normal(0, 1), class = b)
+               ),
+               backend = 'cmdstanr'
+)
+```
 
 
-## Summary: The model-building workflow
+Copy this code into your notebook and run it to finally fit our model 🥳
 
-<!-- TODO finish summary -->
+```{r}
+acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
+               data = acc,
+               family = bernoulli(),
+               prior = c(
+                 prior(normal(0, 1.5), class = Intercept),
+                 prior(normal(0, 1), class = b)
+               ),
+               backend = 'cmdstanr',
+               file = '../data/models/acc_fit'
+)
 
-- **Likelihood:** How is the outcome data distributed?
+summary(acc_fit)
+```
 
-  - Bernoulli, since our data is binary (0 and 1 are our outcomes).
-  
-  
-- **Priors:** How are the model's parameters distributed?
 
- -  Weakly regularising priors that don't restrict the model's estimates, following Cromwell's Rule.
+
+# Checking convergence
+
+Recall from yesterday that the Markov Chain Monte Carlo chains that sample from the posterior are skating around the posterior landscape, trying to find where the posterior probability mass is.
+It's possible that they never find it, or might not do so reliably.
+When the chains don't correctly sample from the posterior, we say the model has not converged.
+
+We want the chains to "mix": in other words, all four chains should be sampling from the same posterior.
+There are a couple ways to tell that this is working as it should.
+
+
+## "Fat hairy caterpillars"
+
+Run the following code to produce so-called "trace plots".
+
+```{r trace-plots, echo=TRUE}
+mcmc_trace(acc_fit,
+           pars = c('b_Intercept', 'b_cond', 'b_sent', 'b_condsent'))
+```
+
+Trace plots show the traces of the four chains as they traversed the posterior during sampling.
+The y axis represents the values of the posterior, and the x axis shows the sample indices (each chain drew 1,000 samples).
+
+If the chains mixed well, then in the words of Shravan Vasishth, the trace plots should look like "fat hairy caterpillars".
+And these ones do!
+
+For comparison, here's an example of some that don't.
+
+```{r bad-trace}
+badfit <- brm(sentence_accepted ~ cond + sent + condsent,
+               data = acc,
+               family = bernoulli(),
+               prior = c(
+                 prior(normal(0, 1.5), class = Intercept),
+                 prior(normal(0, 100), class = b)
+               ),
+               backend = 'cmdstanr',
+              iter = 1000,
+              warmup = 10,
+               file = '../data/models/badfit'
+)
+
+mcmc_trace(badfit,
+           pars = c('b_Intercept', 'b_cond', 'b_sent', 'b_condsent'))
+```
+
+These still mix a little, but they don't overlap quite as densely as the previous ones.
+In even worse scenarios, you might also sometimes see chains that get stuck in one part of the posterior and never mingle with the others.
+But as long as your trace plots look like fat hairy caterpillars, then that's a good first sign 🐛
+
+
+## Rhat = 1.00
+
+The second thing to check is more quantitative.
+For each parameter, the model gives us a diagnostic measure called Rhat ([ɑɹ hæt]).
+Rhat is a measure of how well the chains have mixed.
+It compares the estimates within chains and between chains, and if the chains have mixed well, then the result should be near 1.
+We consider the model to have converged if all Rhat values are equal to 1.00; even an Rhat of 1.01 should make you suspicious.
+
+If we display the summary of our model, then there will be a column called Rhat; all values should be equal to 1.00.
+(We'll look at the other values soon!)
+
+```{r}
+summary(acc_fit)
+```
+
+And so they are!
+
+If there is any Rhat value greater than 1.00, then it means the chains didn't mix well enough, and we cannot trust the posterior estimates we've been given.
+For reference, the model that yielded the bad trace plot above had Rhats = 1.04.
+
+**If you do ever fit a model that yields Rhat > 1.00, [this page](https://mc-stan.org/misc/warnings.html) offers some solutions you could try.**
+
+OK: our model `acc_fit` has converged.
+But there's one more thing to check before we can trust its estimates: **does it do a good job of generating data that looks like the data we observed?**
+One way to find out...
+
+
+# Posterior predictive checks
+
+We've encountered the concept of predictive checks before.
+
+- With *prior* predictive checks, we drew sample values from each parameter's *prior*, used those values to define the likelihood, and used that likelihood to generate simulated outcomes.
+- Now, with *posterior* predictive checks, we draw sample values from each parameter's *posterior*, and use them to do the exact same thing.
+
+In fact, the processes are so similar that we can use `pp_check()` again to give us the means of the posterior predictive distributions, and compare them to the mean of the observed data:
+
+```{r pstr-pred, message=FALSE}
+pp_check(acc_fit, type = 'stat', stat = mean)
+```
+
+The mean of our observed data (the dark vertical line) is smack in the middle of the posterior predictive distribution of means—hurray!
+That's what we want to see.
+If the observed data were far away from the bulk of the posterior predictive distribution, then that would suggest that we might want to change the model architecture to better reflect the generative process behind the data.
+
+Reassured that the model does a decent job of capturing the data, we continue to the Grand Finale: interpreting and reporting the model's results.
 

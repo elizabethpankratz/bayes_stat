@@ -1,0 +1,161 @@
+---
+title: "Interpreting and reporting model results"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=7, fig.height=5, fig.retina=3,
+  out.width = "80%", fig.align = "center",
+  cache = FALSE,
+  echo = FALSE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+
+library(tidyverse)
+library(patchwork)
+library(brms)
+library(bayesplot)
+
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_bw())
+
+acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
+               data = acc,
+               family = bernoulli(),
+               prior = c(
+                 prior(normal(0, 1.5), class = Intercept),
+                 prior(normal(0, 1), class = b)
+               ),
+               backend = 'cmdstanr',
+               file = '../data/models/acc_fit'
+)
+```
+
+
+## Model summary
+
+The posterior distributions are sampled using MCMC, so the posterior distribution for each parameter can be represented as a vector of numeric samples.
+What `summary()` gives us is summary statistics of each of these distributions.
+
+- Under `Estimate`, we get the mean of the posterior distribution of each parameter.
+- Under `Est.Error`, we get the standard deviation.
+- Under `l-95% CI`, we get the 2.5th quantile of the posterior (the lower bound of the 95% Credible Interval).
+- Under `h-95% CI`, we get the 97.5th quantile of the posterior (the upper bound of the 95% Credible Interval).
+
+```{r}
+summary(acc_fit)
+```
+
+
+
+
+<!-- TODO: box of fun things to do with posterior samples -->
+
+
+
+
+The parameter interpretations laid out here deviate in some important ways from the frequentist way of thinking.
+Before you read on, I encourage you to think about how you would interpret these numbers if they came out of, say, `glm()`.
+
+
+### Interpreting coefficient estimates
+
+#### `b_Intercept` (a.k.a. $\alpha$)
+
+The estimated mean log-odds of accepting a sentence when all predictors = 0 is 0.32 log-odds (95% CrI: [0.20, 0.43]).
+This means that the posterior mean is 0.32 log-odds, and 95% of the posterior lies between 0.20 log-odds and 0.43 log-odds.
+
+Because the posterior distribution is a distribution of belief over plausible parameter values, this means that the model believes with 95% probability that the intercept of this model is between 0.20 log-odds and 0.43 log-odds.
+
+<!-- TODO: back-transforming the intercept -->
+
+<!-- We can directly back-transform the intercept *and the intercept only* to probability space: `plogis(0.32)` is a probability of accepting a sentence of 0.58 (95% CrI: [0.55, 0.61]). -->
+<!-- If we wanted to back-transform any of the other parameters, we'd have to multiply them by the contrast coding and then add that result to the intercept—this will be illustrated below. -->
+  
+#### `b_cond` (a.k.a. $\beta_1$)
+
+
+The mean effect of condition—i.e., the difference between production (+0.5) and comprehension (–0.5)—is –0.18 log-odds (95% CrI: [–0.41, 0.04]).
+  - Because the mean effect is negative, the model estimates that participants are more likely to accept sentences in the comprehension condition than the production condition.
+  - **But, because the 95% CrI contains both positive and negative values, the model is not entirely certain about the direction of the effect. It is hedging its bets and leaving open the option that the effect may in fact be positive.** 
+  
+#### `b_sent` (a.k.a. $\beta_2$)
+
+
+The mean effect of sentence type—i.e., the difference between word order (+0.5) and case marking (–0.5)—is 1.84 log-odds (95% CrI: [1.62, 2.08]).
+  - Because the entire 95% CrI is positive, the model is quite certain that this is a positive effect: participants are more likely to accept word order sentences than case-marking ones.
+  - This is also quite a large effect, compared to the others in the model.
+  
+#### `b_condsent` (a.k.a. $\beta_3$)
+
+The interaction between condition and sentence type is estimated at 0.22 log-odds (95% CrI: [–0.01, 0.45]).
+  - Again, because the 95% CrI contains both positive and negative values, the model is not entirely certain about the direction of the interaction. It thinks that it likely is positive—interpretable as a larger difference between sentence types in the production condition than in the copmrehension condition—but it also is leaving open the possibility that the interaction may be small and negative.
+  
+  
+#### Bayesian vs. frequentist interpretations 
+
+Consider the interpretations of `b_cond` and `b_condsent`.
+Both of their 95% CrIs span zero.
+So, if this were a frequentist model and if these were 95% confidence intervals, their containing zero would mean we are forced into one of the two possible outcomes of frequentist hypothesis testing: in this case, we could not reject the null.
+Having reached that binary decision, we'd emerge from the experiment none the wiser about any possible effect of condition and the interaction between condition and sentence type.
+
+But Bayesian models afford us much more interpretability.
+A 95% CrI containing zero doesn't nix the whole story.
+It just means that the model thinks that both negative and positive values are plausible values that the parameter in question could take on.
+And if it allocates more probability mass to the positive or the negative side of zero, that's something we can report.
+
+To their credit, some frequentist modellers also focus on effect size estimation, rather than hypothesis testing.
+But I'd argue that the Bayesian framework gives a more natural way of approaching this, in terms of allocation of belief to different parameter values.
+
+<!-- TODO box: New Statistics -->
+
+
+
+
+# To report the results of this model
+
+## In tables
+
+Use the `fixef()` function to extract only the posterior summaries of the fixed effects.
+And then use `xtable()` from the library [xtable](https://cran.r-project.org/web/packages/xtable/index.html) to generate a LaTeX version of this table, ready (with a bit of tidying) for your next paper.
+
+```{r}
+library(xtable)
+xtable(fixef(acc_fit))
+```
+
+
+
+## In plots
+
+In the [bayesplot](http://mc-stan.org/bayesplot/) package, you can find plots of all kinds designed for Bayesian models.
+`mcmc_trace()` was one of them, and `mcmc_areas()` is another:
+
+```{r echo=TRUE}
+mcmc_areas(acc_fit, 
+           pars = c('b_Intercept', 'b_cond', 'b_sent', 'b_condsent'),
+           prob = 0.95,
+           stat = mean) +
+  geom_vline(xintercept = 0, linetype = 'dotted') +
+  labs(x = 'Log-odds')
+```
+
+This plot visualises the posterior distributions, and I've customised it to show the mean as a vertical line, and the 95% CrI as the shaded region.
+
+
+## In prose
+
+Finally, if you were going to write about this model in your paper, here's how you might report it.
+
+> We fit a Bayesian linear model with a Bernoulli likelihood, predicting sentence acceptance as a function of condition, sentence type, and their interaction.
+
+<!-- TODO finis hthis based on the glossa manuscript: -->
+<!-- The model estimates a likely-negative main effect of Condition ($\beta$ = –0.81 log-odds, 95\% CrI [–1.79, 0.20]), meaning that participants in the production condition are probably less likely to accept sentences than are participants in the comprehension condition. -->
+<!-- However, the 95\% CrI contains zero, so the model is somewhat uncertain about the direction of this effect. -->
+<!-- There is much more certainty in its estimate of the positive effect of Sentence type ($\beta$ = 4.10 log-odds, 95\% CrI [–2.76, 5.51]); the model is sure that word order sentences are much more likely to be accepted than case-marking sentences are. -->
+<!-- Finally, the focus of our hypothesis was the interaction term, but both table and figure show that this interaction was not borne out. -->
+<!-- The interaction coefficient's estimate is very uncertain ($\beta$ = 0.37 log-odds, 95\% CrI [–0.88, 1.70]), and even trends against the hypothesised direction with more probability mass on the positive side of zero. -->
+<!-- Thus, the model does not support our hypothesis that participants who did the production task will be more likely to accept case-marking sentences. -->
+
