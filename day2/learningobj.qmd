@@ -5,6 +5,5 @@ title: "Learning objectives for Day 2"
 - What is the workflow for running a Bayesian analysis?
   - How do we decide what likelihood to use?
   - How do we decide what prior(s) to use?
-- How does the model work out the posterior?
 - How do we implement and fit a Bayesian model using brms?
 - How would we report the results in a publication?

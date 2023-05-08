@@ -85,4 +85,25 @@ In particular, we wanted to know whether participants in the production group wo
 
 The plot you see in `workshop.Rmd` shows that this doesn't seem to be the case—in fact, production participants reject case-marking sentences even more than comprehension participants do!
 
-Let's have a look at how to model this data using `brms`.
+
+## Prepare the data
+
+We are going to use $\pm$ 0.5 sum coding for the condition variable (comprehension as –0.5; production as +0.5) and for the sentence type variable (case marking as –0.5; word order as +0.5).
+Our hypothesis concerns the interaction between these predictors, so we'll include an interaction term as well.
+An interaction is the product of the two interacting variables, and we'll scale that by two so that the interaction also takes the values $\pm$ 0.5.
+
+To set up the predictors we'll use, copy and run the following code in your R notebook:
+
+```{r echo=TRUE}
+acc <- acc %>% 
+  mutate(
+    cond = ifelse(condition == 'comprehension', -0.5, 0.5),
+    sent = ifelse(sentence_type == 'case_marking', -0.5, 0.5),
+    condsent = cond * sent * 2
+  )
+```
+
+(There are, of course, ways to set contrasts without creating whole new columns, e.g., using `contr.sum(2)/2`, but I like this way because it's super explicit about what information the model's going to use.)
+
+
+Next, let's have a look at how to model this data using `brms`.

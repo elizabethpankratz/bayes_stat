@@ -525,10 +525,9 @@ Adapt the code above to fit a few more prior predictive models using these prior
 (and any others you want to try!)
 
 For each model, generate a summary histogram using `pp_check()`.
-Which of these priors produces the most even-looking distribution of outcome means?
-Is that the prior we'll want to use?
+Which of these histograms produces the most even-looking distribution?
 
-Once you have your own thoughts on these questions, uncollapse this box to have a look at mine:
+Once you have your own solution, uncollapse this box to have a look at mine:
 
 ::: {.callout-note collapse="true"}
 #### Prior predictive distributions
