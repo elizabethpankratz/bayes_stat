@@ -5,6 +5,7 @@ project:
     - "*.qmd"
   resources:
     - "img/"
+    - "data/"
 
 website:
   title: "Bayes, *stat*!"
