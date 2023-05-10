@@ -27,7 +27,7 @@ acc <- read_csv('../data/acceptance.csv')
 I've created a pre-loaded directory structure for this workshop that you can download.
 (If you're having internet issues, ask me for the version on USB.)
 
-1. Right-click on [this link](data/bayes_workshop.zip) and download the zip file.
+1. Right-click on [this link](../data/bayes_workshop.zip) and download the zip file.
 2. Unzip it and relocate the directory to wherever you want on your computer.
 3. To open the R project, click on the file `bayes_workshop.Rproj` (you might not see the `.Rproj` part—then just click on the thing that says `bayes_workshop`). This will open the R project within RStudio; you'll be able to tell you're in the R project because at the top right of your RStudio window, you'll see its name:
 

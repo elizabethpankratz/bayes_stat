@@ -71,7 +71,7 @@ acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
 Copy this code into your notebook and run it to finally fit our model 🥳
 (It might take a minute or two, so be patient.)
 
-```{r echo=TRUE}
+```{r}
 acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
                data = acc,
                family = bernoulli(),
@@ -132,8 +132,10 @@ mcmc_trace(badfit,
 ```
 
 These still mix a little, but they don't overlap quite as densely as the previous ones.
-In even worse scenarios, you might also sometimes see chains that get stuck in one part of the posterior and never mingle with the others: these show up as a straight horizontal line on a trace plot.
-But as long as your trace plots look like fat hairy caterpillars, then that's a good first sign 🐛
+
+In even worse scenarios, you might also sometimes see chains that get stuck in one part of the posterior and never mingle with the others: these show up on a trace plot as a straight horizontal line.
+
+But as long as your trace plots look like fat hairy caterpillars, then that's a good sign 🐛
 
 
 ## Rhat = 1.00

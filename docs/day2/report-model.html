@@ -262,7 +262,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="summarising-the-posteriors" class="level2">
 <h2 class="anchored" data-anchor-id="summarising-the-posteriors">Summarising the posteriors</h2>
-<p>The posterior distributions that the model estimates are sampled using MCMC. This essentially means that each parameter has a posterior distribution consisting of many individual sampled values. Like with any variable, we can compute summary statistics over these distributions; that’s what <code>summary()</code> gives us.</p>
+<p>The posterior distributions estimated by the model are sampled using MCMC. This essentially means that each parameter has a posterior distribution consisting of many individual sampled values. Like with any variable, we can compute summary statistics over these distributions; that’s what <code>summary()</code> gives us.</p>
 <ul>
 <li>Under <code>Estimate</code>, we get the mean of the posterior distribution of each parameter.</li>
 <li>Under <code>Est.Error</code>, we get the standard deviation.</li>
@@ -308,7 +308,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </div>
 </div>
 <p>The estimated mean log-odds of accepting a sentence when all predictors = 0 is 0.32 log-odds (95% CrI: [0.20, 0.43]). This means that the posterior mean is 0.32 log-odds, and 95% of the posterior lies between 0.20 log-odds and 0.43 log-odds.</p>
-<p>Because the posterior distribution is a distribution of belief over plausible parameter values, this means that the model believes with 95% probability that the intercept of this model is between 0.20 log-odds and 0.43 log-odds.</p>
+<p>Because the posterior distribution is a distribution of belief over plausible parameter values, this means that the model thinks there’s a 95% probability that the intercept of this model is between 0.20 log-odds and 0.43 log-odds.</p>
 </section>
 <section id="b_cond-aka-beta_1" class="level4">
 <h4 class="anchored" data-anchor-id="b_cond-aka-beta_1"><code>b_cond</code> (aka <span class="math inline">\(\beta_1\)</span>)</h4>
@@ -397,7 +397,7 @@ The New Statistics
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">xtable</span>(<span class="fu">fixef</span>(acc_fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>% latex table generated in R 4.3.0 by xtable 1.8-4 package
-% Wed May 10 12:55:04 2023
+% Wed May 10 13:29:50 2023
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrr}

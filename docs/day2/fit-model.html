@@ -288,16 +288,7 @@ logit(\theta) &amp; = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\b
 </div>
 <p>Copy this code into your notebook and run it to finally fit our model 🥳 (It might take a minute or two, so be patient.)</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>acc_fit <span class="ot">&lt;-</span> <span class="fu">brm</span>(sentence_accepted <span class="sc">~</span> cond <span class="sc">+</span> sent <span class="sc">+</span> condsent,</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> acc,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">family =</span> <span class="fu">bernoulli</span>(),</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">prior =</span> <span class="fu">c</span>(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="fl">1.5</span>), <span class="at">class =</span> Intercept),</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">prior</span>(<span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">class =</span> b)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>               ),</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">backend =</span> <span class="st">'cmdstanr'</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">file =</span> <span class="st">'../data/models/acc_fit'</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
 </div>
 </section>
 <section id="checking-convergence" class="level1">
@@ -308,8 +299,8 @@ logit(\theta) &amp; = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\b
 <h2 class="anchored" data-anchor-id="fat-hairy-caterpillars">“Fat hairy caterpillars”</h2>
 <p>Run the following code to produce so-called “trace plots”.</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mcmc_trace</span>(acc_fit,</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">'b_Intercept'</span>, <span class="st">'b_cond'</span>, <span class="st">'b_sent'</span>, <span class="st">'b_condsent'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mcmc_trace</span>(acc_fit,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">pars =</span> <span class="fu">c</span>(<span class="st">'b_Intercept'</span>, <span class="st">'b_cond'</span>, <span class="st">'b_sent'</span>, <span class="st">'b_condsent'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -330,14 +321,16 @@ logit(\theta) &amp; = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\b
 </div>
 </div>
 </div>
-<p>These still mix a little, but they don’t overlap quite as densely as the previous ones. In even worse scenarios, you might also sometimes see chains that get stuck in one part of the posterior and never mingle with the others: these show up as a straight horizontal line on a trace plot. But as long as your trace plots look like fat hairy caterpillars, then that’s a good first sign 🐛</p>
+<p>These still mix a little, but they don’t overlap quite as densely as the previous ones.</p>
+<p>In even worse scenarios, you might also sometimes see chains that get stuck in one part of the posterior and never mingle with the others: these show up on a trace plot as a straight horizontal line.</p>
+<p>But as long as your trace plots look like fat hairy caterpillars, then that’s a good sign 🐛</p>
 </section>
 <section id="rhat-1.00" class="level2">
 <h2 class="anchored" data-anchor-id="rhat-1.00">Rhat = 1.00</h2>
 <p>The second thing to check is more quantitative. For each parameter, the model gives us a diagnostic measure called Rhat ([ɑɹ hæt]). Rhat is a measure of how well the chains have mixed. It compares the estimates within chains and between chains, and if the chains have mixed well, then the result should be near 1. We consider the model to have converged if all Rhat values are equal to 1.00; even an Rhat of 1.01 should make you suspicious.</p>
 <p>In the model summary, there is a column called Rhat. All values in this column should be equal to 1.00. (We’ll look at the other values in this table on the next page!)</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(acc_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(acc_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> Family: bernoulli 
   Links: mu = logit 
@@ -372,7 +365,7 @@ scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
 </ul>
 <p>In fact, the processes are so similar that we can use <code>pp_check()</code> again to give us the means of the posterior predictive distributions, and compare them to the mean of the observed data:</p>
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(acc_fit, <span class="at">type =</span> <span class="st">'stat'</span>, <span class="at">stat =</span> mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(acc_fit, <span class="at">type =</span> <span class="st">'stat'</span>, <span class="at">stat =</span> mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">

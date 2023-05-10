@@ -36,7 +36,7 @@ acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
 
 ## Summarising the posteriors
 
-The posterior distributions that the model estimates are sampled using MCMC.
+The posterior distributions estimated by the model are sampled using MCMC.
 This essentially means that each parameter has a posterior distribution consisting of many individual sampled values.
 Like with any variable, we can compute summary statistics over these distributions; that's what `summary()` gives us.
 
@@ -66,7 +66,7 @@ mcmc_dens(acc_fit, pars = 'b_Intercept') +
 The estimated mean log-odds of accepting a sentence when all predictors = 0 is 0.32 log-odds (95% CrI: [0.20, 0.43]).
 This means that the posterior mean is 0.32 log-odds, and 95% of the posterior lies between 0.20 log-odds and 0.43 log-odds.
 
-Because the posterior distribution is a distribution of belief over plausible parameter values, this means that the model believes with 95% probability that the intercept of this model is between 0.20 log-odds and 0.43 log-odds.
+Because the posterior distribution is a distribution of belief over plausible parameter values, this means that the model thinks there's a 95% probability that the intercept of this model is between 0.20 log-odds and 0.43 log-odds.
 
   
 #### `b_cond` (aka $\beta_1$)

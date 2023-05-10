@@ -596,7 +596,7 @@ Bayesian hierarchical models
 <div class="cell" data-layout-align="center">
 
 </div>
-<p>This model will estimate posteriors based on the priors only, ignoring all the data. Now we’ll use these posteriors to generate some new data, the way the toy example above did, and see whether it look reasonable.</p>
+<p>This model will estimate posteriors based on the priors only, ignoring all the data (essentially reproducing the priors). Now we’ll use these posteriors to generate some new data and see whether it look reasonable.</p>
 <p>Generating predictive data is such a common thing to do that brms comes with a useful function that helps us do it graphically: <code>pp_check()</code> (documentation <a href="https://paul-buerkner.github.io/brms/reference/pp_check.brmsfit.html">here</a>).</p>
 <p>Using your model <code>priorpred10</code>, run the following code. Here’s what the arguments we pass to <code>pp_check()</code> mean:</p>
 <ul>
