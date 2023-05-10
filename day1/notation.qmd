@@ -1,0 +1,157 @@
+---
+title: "Notation"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = here::here())
+
+library(tidyverse)
+library(patchwork)
+library(extrafont)
+loadfonts()
+
+# To solve some conflicts between packages
+select <- dplyr::select
+
+# dplyr and ggplot settings
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_classic())
+theme_update(text = element_text(family = "Fira Sans", size=12),
+             axis.title.y = element_text(angle=0, vjust=0.5, hjust=0))
+
+cbpalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+update_palette <- c("#ADE1FF", "#0072B2")  # prior, posterior
+```
+
+
+Let's formalise the two models we've just seen using some standard notation. 
+
+**The model with the uniform prior:**
+
+$$
+\begin{aligned}
+\text{correct} &\sim Bernoulli(\theta) \\
+\theta &\sim Beta(1, 1)
+\end{aligned}
+$$
+
+**The model with the prior around chance:**
+
+$$
+\begin{aligned}
+\text{correct} &\sim Bernoulli(\theta) \\
+\theta &\sim Beta(20, 20)
+\end{aligned}
+$$
+
+
+- The distribution that the data, $\text{correct}$, follows is called the **likelihood.**
+  - Here, it's $Bernoulli(\theta)$.
+- The distribution that the model-internal parameter $\theta$ follows is called the **prior.**
+  - Here, it's $\theta \sim Beta(x, y)$.
+
+
+::: {.callout-tip collapse="true"}
+#### The many shapes of the beta distribution
+
+Here are some examples of how beta distributions can look:
+
+```{r beta-plots}
+# The possible values for theta, the probability of success.
+theta <- seq(0, 1, 0.001)
+
+beta11 <- tibble(
+  theta = theta,
+  dens = dbeta(theta, 1, 1)
+) %>%
+  ggplot(aes(x = theta, y = dens)) +
+  geom_line(colour = update_palette[2]) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+  ) +
+  labs(
+    y = 'Prob.\ndens.',
+    x = 'theta',
+    title = 'Beta(1, 1)'
+  ) +
+  NULL
+
+beta0505 <- tibble(
+  theta = theta,
+  dens = dbeta(theta, 0.5, 0.5)
+) %>%
+  ggplot(aes(x = theta, y = dens)) +
+  geom_line(colour = update_palette[2]) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+  ) +
+  labs(
+    y = 'Prob.\ndens.',
+    x = 'theta',
+    title = 'Beta(0.5, 0.5)'
+  ) +
+  NULL
+
+beta55 <- tibble(
+  theta = theta,
+  dens = dbeta(theta, 5, 5)
+) %>%
+  ggplot(aes(x = theta, y = dens)) +
+  geom_line(colour = update_palette[2]) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+  ) +
+  labs(
+    y = 'Prob.\ndens.',
+    x = 'theta',
+    title = 'Beta(5, 5)'
+  ) +
+  NULL
+
+beta510 <- tibble(
+  theta = theta,
+  dens = dbeta(theta, 5, 10)
+) %>%
+  ggplot(aes(x = theta, y = dens)) +
+  geom_line(colour = update_palette[2]) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+  ) +
+  labs(
+    y = 'Prob.\ndens.',
+    x = 'theta',
+    title = 'Beta(5, 10)'
+  ) +
+  NULL
+
+(beta0505 + beta11) /
+(beta55 + beta510)
+```
+
+:::
+
+::: {.callout-tip collapse="true"}
+#### The beta-binomial conjugate case, or, why not Uniform(0, 1)?
+
+We could just as easily have specified the first model as:
+
+$$
+\begin{aligned}
+\text{correct} &\sim Bernoulli(\theta) \\
+\theta &\sim Uniform(0, 1)
+\end{aligned}
+$$
+
+But we like to use beta priors for a binomial (Bernoulli) outcome because this is an example of a [conjugate case](https://vasishth.github.io/bayescogsci/book/ch-introBDA.html).
+
+A conjugate case is a kind of model where the posterior and the prior belong to the same distribution, as long as a particular likelihood is used.
+Here, with a Bernoulli likelihood, both prior and posterior belong to beta distributions: the so-called "beta-binomial conjugate case".
+
+So, for internal consistency, I'm using beta priors throughout.
+
+:::

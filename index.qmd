@@ -4,11 +4,11 @@ subtitle: "CLE Retreat 2023"
 sidebar: false
 ---
 
-**What you can expect from this two-day workshop:**
+**What you can expect from this workshop:**
 
 - Learn the conceptual whys and wherefores of Bayesian inference.
 - Get hands-on practice fitting Bayesian models in R using brms.
-- Have some discussions as well as some individual work time.
+- Have some conversations, some individual work, and plenty of chances to ask questions.
 
 
 **Intended audience:**
@@ -17,7 +17,26 @@ sidebar: false
 - You are familiar with linear regression models and want to know how to think about them from a Bayesian perspective.
 
 
+## Pre-workshop set-up
+
 To be able to run the code we'll use, **please follow the set-up instructions [here](https://stefanocoretta.github.io/sqmb/setup.html), and make sure everything is running before the workshop begins.**
+
+To check whether CmdStan has been correctly installed, you can run the following code in RStudio's console:
+
+```{r eval=FALSE}
+library(cmdstanr)
+file <- file.path(cmdstan_path(), "examples", "bernoulli", "bernoulli.stan")
+mod  <- cmdstan_model(file)
+```
+
+If running this code produces no errors and you end up with an object `mod` in your Environment pane, then you're good to go!
+
+Also make sure the following packages are installed:
+
+- `tidyverse`
+- `brms`
+- `bayesplot`
+- `knitr`
 
 
 ---

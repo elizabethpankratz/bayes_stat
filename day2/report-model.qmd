@@ -34,104 +34,131 @@ acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
 ```
 
 
-## Model summary
+## Summarising the posteriors
 
-The posterior distributions are sampled using MCMC, so the posterior distribution for each parameter can be represented as a vector of numeric samples.
-What `summary()` gives us is summary statistics of each of these distributions.
+The posterior distributions that the model estimates are sampled using MCMC.
+This essentially means that each parameter has a posterior distribution consisting of many individual sampled values.
+Like with any variable, we can compute summary statistics over these distributions; that's what `summary()` gives us.
 
 - Under `Estimate`, we get the mean of the posterior distribution of each parameter.
 - Under `Est.Error`, we get the standard deviation.
 - Under `l-95% CI`, we get the 2.5th quantile of the posterior (the lower bound of the 95% Credible Interval).
 - Under `h-95% CI`, we get the 97.5th quantile of the posterior (the upper bound of the 95% Credible Interval).
 
-```{r}
+```{r echo=TRUE}
 summary(acc_fit)
 ```
 
-
-
-
-<!-- TODO: box of fun things to do with posterior samples -->
-
-
-
-
+We'll go through these estimates now one by one and talk about how they can be understood.
 The parameter interpretations laid out here deviate in some important ways from the frequentist way of thinking.
-Before you read on, I encourage you to think about how you would interpret these numbers if they came out of, say, `glm()`.
+**Before you read on, I encourage you to think about how you would interpret these numbers if they came out of, say, `glm()`, and compare that to the interpretations given here.**
 
 
 ### Interpreting coefficient estimates
 
-#### `b_Intercept` (a.k.a. $\alpha$)
+#### `b_Intercept` (aka $\alpha$)
+
+```{r echo=TRUE}
+mcmc_dens(acc_fit, pars = 'b_Intercept') +
+  labs(title = 'Posterior distribution of b_Intercept')
+```
 
 The estimated mean log-odds of accepting a sentence when all predictors = 0 is 0.32 log-odds (95% CrI: [0.20, 0.43]).
 This means that the posterior mean is 0.32 log-odds, and 95% of the posterior lies between 0.20 log-odds and 0.43 log-odds.
 
 Because the posterior distribution is a distribution of belief over plausible parameter values, this means that the model believes with 95% probability that the intercept of this model is between 0.20 log-odds and 0.43 log-odds.
 
-<!-- TODO: back-transforming the intercept -->
-
-<!-- We can directly back-transform the intercept *and the intercept only* to probability space: `plogis(0.32)` is a probability of accepting a sentence of 0.58 (95% CrI: [0.55, 0.61]). -->
-<!-- If we wanted to back-transform any of the other parameters, we'd have to multiply them by the contrast coding and then add that result to the intercept—this will be illustrated below. -->
   
-#### `b_cond` (a.k.a. $\beta_1$)
+#### `b_cond` (aka $\beta_1$)
 
+```{r echo=TRUE}
+mcmc_dens(acc_fit, pars = 'b_cond') +
+  labs(title = 'Posterior distribution of b_cond') +
+  geom_vline(xintercept = 0, linetype = 'dotted')
+```
 
 The mean effect of condition—i.e., the difference between production (+0.5) and comprehension (–0.5)—is –0.18 log-odds (95% CrI: [–0.41, 0.04]).
-  - Because the mean effect is negative, the model estimates that participants are more likely to accept sentences in the comprehension condition than the production condition.
-  - **But, because the 95% CrI contains both positive and negative values, the model is not entirely certain about the direction of the effect. It is hedging its bets and leaving open the option that the effect may in fact be positive.** 
-  
-#### `b_sent` (a.k.a. $\beta_2$)
 
+Because the mean effect is negative, the model estimates that participants are, on average, more likely to accept sentences in the comprehension condition than the production condition.
+**But, because the 95% CrI spans both positive and negative values, the model is not entirely certain about the direction of the effect. It believes that a small positive effect may also be consistent with this data.**
+  
+
+#### `b_sent` (aka $\beta_2$)
+
+```{r echo=TRUE}
+mcmc_dens(acc_fit, pars = 'b_sent') +
+  labs(title = 'Posterior distribution of b_sent')
+```
 
 The mean effect of sentence type—i.e., the difference between word order (+0.5) and case marking (–0.5)—is 1.84 log-odds (95% CrI: [1.62, 2.08]).
-  - Because the entire 95% CrI is positive, the model is quite certain that this is a positive effect: participants are more likely to accept word order sentences than case-marking ones.
-  - This is also quite a large effect, compared to the others in the model.
+
+Because the entire 95% CrI is positive, the model is quite certain that this is a positive effect: participants are more likely to accept word order sentences than case-marking ones.
+This is also quite a large effect, compared to the others in the model.
   
-#### `b_condsent` (a.k.a. $\beta_3$)
+
+#### `b_condsent` (aka $\beta_3$)
+
+```{r echo=TRUE}
+mcmc_dens(acc_fit, pars = 'b_condsent') +
+  labs(title = 'Posterior distribution of b_condsent') +
+  geom_vline(xintercept = 0, linetype = 'dotted')
+```
 
 The interaction between condition and sentence type is estimated at 0.22 log-odds (95% CrI: [–0.01, 0.45]).
-  - Again, because the 95% CrI contains both positive and negative values, the model is not entirely certain about the direction of the interaction. It thinks that it likely is positive—interpretable as a larger difference between sentence types in the production condition than in the copmrehension condition—but it also is leaving open the possibility that the interaction may be small and negative.
+
+Again, because the 95% CrI contains both positive and negative values, the model is not entirely certain about the direction of the interaction. 
+It thinks that it likely is positive—which we can interpret as a larger difference between sentence types in the production condition than in the comprehension condition—but it also is leaving open the possibility that the interaction may be small and negative.
   
   
-#### Bayesian vs. frequentist interpretations 
+### Bayesian vs. frequentist interpretations 
 
 Consider the interpretations of `b_cond` and `b_condsent`.
-Both of their 95% CrIs span zero.
-So, if this were a frequentist model and if these were 95% confidence intervals, their containing zero would mean we are forced into one of the two possible outcomes of frequentist hypothesis testing: in this case, we could not reject the null.
-Having reached that binary decision, we'd emerge from the experiment none the wiser about any possible effect of condition and the interaction between condition and sentence type.
+Both of their 95% Credible Intervals span both positive and negative values—in other words, the intervals contain zero.
+
+If these were 95% _confidence_ intervals and if we were using them to do frequentist hypothesis testing, the intervals containing zero would force us into one of the two possible outcomes: in this case, we could not reject the null.
+Having reached that binary decision, we'd emerge from the experiment not having learned much about any possible association of sentence acceptance with condition, or with the interaction between condition and sentence type.
 
 But Bayesian models afford us much more interpretability.
-A 95% CrI containing zero doesn't nix the whole story.
-It just means that the model thinks that both negative and positive values are plausible values that the parameter in question could take on.
-And if it allocates more probability mass to the positive or the negative side of zero, that's something we can report.
+A 95% CrI containing zero doesn't automatically nix the whole story.
+**It just means that the model thinks that both negative and positive values are plausible values that the parameter in question could take on.**
+And if it allocates more probability mass to the positive or the negative side of zero, **that's something we can report.**
 
-To their credit, some frequentist modellers also focus on effect size estimation, rather than hypothesis testing.
-But I'd argue that the Bayesian framework gives a more natural way of approaching this, in terms of allocation of belief to different parameter values.
-
-<!-- TODO box: New Statistics -->
+To their credit, some frequentist modellers also focus on effect size estimation and are moving away from hypothesis testing.
+But I'd argue that the Bayesian framework gives a nicely natural way of approaching this: in terms of allocation of belief to different parameter values.
 
 
+::: {.callout-tip collapse="true"}
+#### The New Statistics
+
+I'm not the only one who thinks this way: here are a couple voices from the literature advocating the New Statistics, an approach that shifts the focus from hypothesis testing to effect size estimation.
+
+Cumming, G. (2014). *The New Statistics: Why and How.* Psychological Science, 25(1), 7–29. <https://doi.org/10.1177/0956797613504966>
+
+Kruschke, J. K., & Liddell, T. M. (2018). *The Bayesian New Statistics: Hypothesis testing, estimation, meta-analysis, and power analysis from a Bayesian perspective.* Psychonomic Bulletin & Review, 25(1), 178–206. <https://doi.org/10.3758/s13423-016-1221-4>
+
+:::
 
 
-# To report the results of this model
 
-## In tables
+
+## To report the results of this model
+
+### In tables
 
 Use the `fixef()` function to extract only the posterior summaries of the fixed effects.
 And then use `xtable()` from the library [xtable](https://cran.r-project.org/web/packages/xtable/index.html) to generate a LaTeX version of this table, ready (with a bit of tidying) for your next paper.
 
-```{r}
+```{r echo=TRUE}
 library(xtable)
 xtable(fixef(acc_fit))
 ```
 
 
 
-## In plots
+### In plots
 
 In the [bayesplot](http://mc-stan.org/bayesplot/) package, you can find plots of all kinds designed for Bayesian models.
-`mcmc_trace()` was one of them, and `mcmc_areas()` is another:
+`mcmc_trace()` and `mcmc_dens()` were two of them, and `mcmc_areas()` is another:
 
 ```{r echo=TRUE}
 mcmc_areas(acc_fit, 
@@ -142,20 +169,37 @@ mcmc_areas(acc_fit,
   labs(x = 'Log-odds')
 ```
 
-This plot visualises the posterior distributions, and I've customised it to show the mean as a vertical line, and the 95% CrI as the shaded region.
+This plot nicely visualises the posterior distributions in relation to one another, and I've customised it to show the mean as a vertical line, and the 95% CrI as the shaded region.
+It can be customised this way because all bayesplot plots are ggplot objects.
 
 
-## In prose
+
+### In prose
 
 Finally, if you were going to write about this model in your paper, here's how you might report it.
+For the sake of illustration, this example goes through every parameter—in reality, you'd probably focus mainly on the ones that are most relevant to your hypothesis (here, the interaction between condition and sentence type).
 
 > We fit a Bayesian linear model with a Bernoulli likelihood, predicting sentence acceptance as a function of condition, sentence type, and their interaction.
+The model used weakly regularising priors that we selected based on prior predictive checks.
+>
+> The model estimates a likely-negative effect of condition ($\beta$ = –0.18 log-odds, 95\% CrI [–0.41, 0.04]), meaning that participants in the production condition are probably less likely to accept sentences than are participants in the comprehension condition.
+However, the 95% CrI contains positive values as well, indicating some uncertainty about the direction of the effect.
+>
+> There is more certainty in the estimate of the much larger effect of sentence type ($\beta$ = 1.84 log-odds, 95\% CrI [–1.62, 2.08]); the model is sure that word order sentences are much more likely to be accepted than case-marking sentences are.
+>
+> Finally, we hypothesised that we would observe a negative interaction, with a larger difference between sentence types in the comprehension condition than the production condition.
+However, the coefficient that the model estimates is almost entirely positive ($\beta$ = 0.22, 95% CrI: [–0.01, 0.45]), giving much more credibility to an interaction going in the _opposite_ direction to the one we hypothesised.
 
-<!-- TODO finis hthis based on the glossa manuscript: -->
-<!-- The model estimates a likely-negative main effect of Condition ($\beta$ = –0.81 log-odds, 95\% CrI [–1.79, 0.20]), meaning that participants in the production condition are probably less likely to accept sentences than are participants in the comprehension condition. -->
-<!-- However, the 95\% CrI contains zero, so the model is somewhat uncertain about the direction of this effect. -->
-<!-- There is much more certainty in its estimate of the positive effect of Sentence type ($\beta$ = 4.10 log-odds, 95\% CrI [–2.76, 5.51]); the model is sure that word order sentences are much more likely to be accepted than case-marking sentences are. -->
-<!-- Finally, the focus of our hypothesis was the interaction term, but both table and figure show that this interaction was not borne out. -->
-<!-- The interaction coefficient's estimate is very uncertain ($\beta$ = 0.37 log-odds, 95\% CrI [–0.88, 1.70]), and even trends against the hypothesised direction with more probability mass on the positive side of zero. -->
-<!-- Thus, the model does not support our hypothesis that participants who did the production task will be more likely to accept case-marking sentences. -->
 
+**Notice that _nowhere_ are we talking about "evidence" or "significance" or "rejecting the null".**
+We're also not focused on whether or not the 95% CrIs contain zero.
+Rather, we're looking at the range of estimates that the 95% CrIs contain, and **observing the extent to which this is consistent with our hypotheses.**
+
+(If you do want to do Bayesian hypothesis testing and actually find "evidence" for one model over another, you can do this using [Bayes factors](https://vasishth.github.io/bayescogsci/book/ch-bf.html).)
+
+
+## Take-home message about interpreting Bayesian models
+
+The most that this Bayesian inferential model can do is **allocate its belief over a range of possible effects, of possible parameter values; we are not finding evidence for or against any effects or hypotheses.**
+This is a crucial thing to know and understand, and it might feel uncomfortable and nebulous at first.
+But the payoff to dealing with this uncertainty is a model that gives you much better interpretability.

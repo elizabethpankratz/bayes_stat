@@ -1,0 +1,77 @@
+---
+title: "95% Credible Intervals"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = here::here())
+
+library(tidyverse)
+library(patchwork)
+library(extrafont)
+loadfonts()
+
+# To solve some conflicts between packages
+select <- dplyr::select
+
+# dplyr and ggplot settings
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_classic())
+theme_update(text = element_text(family = "Fira Sans", size=12),
+             axis.title.y = element_text(angle=0, vjust=0.5, hjust=0))
+
+cbpalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+update_palette <- c("#ADE1FF", "#0072B2")  # prior, posterior
+```
+
+
+The 95% Credible Interval (abbreviated as 95% CrI) defines the range in which the model is **95% certain** that the true value lies.
+
+The 95% CrI has this interpretation because **it contains 95% of the probability mass of the entire posterior distribution.**
+And not just any 95%: it contains the highest-density 95% (i.e., the "tallest" and "narrowest" region possible).
+
+Put differently, the 95% CrI spans the distribution **from the 2.5th quantile up to the 97.5th quantile.**
+
+Here's how it looks, shaded in light blue:
+
+```{r pstr-dens-cri, message=FALSE}
+# The possible values for theta, the probability of success.
+theta <- seq(0, 1, 0.001)
+
+# Create the density function for 80 successes, 20 failures, over theta.
+dens <- dbeta(theta, 80, 20)
+
+# Get the 2.5th and 97.5th quantiles of this distribution; the 25th and 975th elements
+lower <- qbeta(0.025, 80, 20)
+upper <- qbeta(0.975, 80, 20)
+
+tibble(
+  theta = theta,
+  dens = dens
+) %>%
+  ggplot(aes(x = theta, y = dens)) +
+  geom_line(colour = update_palette[2]) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+  ) +
+  labs(
+    y = 'Probability\ndensity',
+    x = 'Probability of answering correctly (theta)'
+  ) +
+  scale_x_continuous(breaks=seq(0, 1, 0.2)) +
+  geom_ribbon(aes(x = ifelse(theta >= lower & theta <= upper, theta, NA), ymin = 0, ymax = dens), alpha = 0.3, fill = "#0072B2") +
+  annotate(
+    "segment",
+    x = lower, xend = upper, y = 11, yend = 11,
+    arrow = arrow(ends = "both", angle = 90, length = unit(.2, "cm")),
+    linewidth = 0.8
+  ) +
+  annotate("label", x = 0.8, y = 11.5, label = "95%", family = 'Fira Sans') +
+  NULL
+# Credit to Stefano for the nice 95% span
+```
+
+The interpretation of the Bayesian Credible Interval—the range within which, with 95% probability, the true value lies—is the interpretation we often **instinctively want the frequentist confidence interval to have.**
+
+This is considered by some to be a point in favour of the Bayesian framework: it reflects our intuitions a little bit better.

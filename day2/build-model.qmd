@@ -154,7 +154,7 @@ Our model today will have a Bernoulli likelihood, since our data is binary: 0 if
 #### Intuition: How can a probability produce binary outcomes?
 
 Imagine a flip of a fair coin, where the probability of getting heads is $\theta = 0.5$.
-In Bernoulli terms, the outcome representing "success" is generated with this probability $\theta$, and the outcome representing "failure", with probability $1 - \theta$.
+In Bernoulli terms, the outcome representing "success" is generated with this probability $\theta$, and the outcome representing "failure" is generated with probability $1 - \theta$.
 
 So, if you flip a fair coin ten times, you'll get ten observations of binary outcomes (heads/tails), and probably about half of them will be heads ("success").
 :::
@@ -162,13 +162,13 @@ So, if you flip a fair coin ten times, you'll get ten observations of binary out
 
 ### Other likelihoods
 
-Other likelihoods you may encounter include Poisson (for count data) or beta (for data in [0, 1]), and there are certainly more besides.
-But for most use cases in experimental linguistics, the three highlighted above will be ones we reach for.
+Other likelihoods you may encounter include Poisson (for count data) or beta (for data in [0, 1]), and there are more besides.
+But for the usual analyses in experimental linguistics, the three above will be ones we reach for.
 
 
 ## Begin building the model
 
-Now that we have a likelihood, the next step is to think about what priors our model needs, and how they might be defined.
+Now that we have a likelihood, the next step is to think about what priors our model needs.
 
 You saw that each of those likelihood functions above contains parameters that define their shape: $\mu$, $\sigma$, $\theta$.
 **Every parameter in a Bayesian model needs to have a prior** that tells the model which values are a priori plausible for that parameter to take on.
@@ -194,8 +194,41 @@ Converting probabilities (bounded between 0 and 1) into log-odds (unbounded) mov
 ::: {.callout-tip collapse="true"}
 #### What are log-odds and why do we use them?
 
-<!-- TODO  -->
-<!-- (If you haven't encountered this concept before, check out [these slides](https://stefanocoretta.github.io/sqmb/slides/w07/#1) later.) -->
+You've probably heard sayings like "What are the odds?"
+
+We use the term "odds" colloquially, but it also has a formal definition in statistics:
+
+$$
+\text{odds} = \frac{\text{probability of a thing happening}}{\text{probability of the thing not happening}} = \frac{p}{1-p}
+$$
+Odds can be > 1 (if $p$ > 0.5) or < 1 (if $p$ < 0.5), but they cannot be negative.
+However, we want a scale that can take on positive _or_ negative values, giving us a continuous space to fit a line in.
+
+If we take the log of the odds, this effectively "unsquishes" the region in [0, 1], mapping it to ($-\infty$, 0].
+
+So, log-odds are a transformation of probabilities from [0, 1] into the range ($-\infty$, $\infty$).
+
+```{r p-log-odds, warning=FALSE}
+tibble(
+  p = seq(0, 1, by = 0.001),
+  log_odds = qlogis(p)
+) %>%
+  ggplot(aes(log_odds, p)) +
+  geom_hline(yintercept = 0.5, linetype = "dashed") +
+  geom_hline(yintercept = 0, colour = "#CC79A7", size = 1) +
+  geom_hline(yintercept = 1, colour = "#CC79A7", size = 1) +
+  geom_vline(xintercept = 0, alpha = 0.5) +
+  geom_line(size = 2) +
+  geom_point(x = 0, y = 0.5, colour = "#CC79A7", size = 4) +
+  scale_x_continuous(breaks = seq(-6, 6, by = 1), minor_breaks = NULL, limits = c(-6, 6)) +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), minor_breaks = NULL) +
+  labs(
+    title = "Correspondence between log-odds and probabilities",
+    x = "Log-odds",
+    y = "Probability",
+    caption = '(Plot courtesy of Stefano Coretta)'
+  )
+```
 
 :::
 
@@ -209,11 +242,10 @@ $$
 
 There's a lot of Greek here!
 $\alpha$, $\beta_1$, $\beta_2$, and $\beta_3$ are the parameters that we want our model to estimate.
-You might recognise $\alpha$ as the line's intercept, and all the $\beta$s are the slopes, the effects, the coefficients of our predictors.
+You might recognise $\alpha$ as the line's intercept, and all the $\beta$s are the slopes, aka the effects, aka the coefficients of our predictors.
 We will need priors for all of these parameters.
 
-What do priors do?
-They tell the model which values for each parameter we think are plausible, and they do this by describing how these parameter values are distributed.
+**The priors will tell the model which values for each parameter we think are plausible, and they do this by describing how these parameter values are distributed.**
 So, formally(ish), we'll end up with a model that looks like this:
 
 $$
@@ -255,9 +287,9 @@ Lindley (1985), who named the rule, did so because wider priors allow us this po
 
 **References:**
 
-Jackman, Simon. (2009). *Bayesian analysis for the social sciences.* London: John Wiley & Sons, Ltd.
+Jackman, S. (2009). *Bayesian analysis for the social sciences.* London: John Wiley & Sons, Ltd.
 
-Lindley, Dennis V. (1985). *Making decisions.* 2nd ed. London: John Wiley & Sons, Ltd.
+Lindley, D. V. (1985). *Making decisions.* 2nd ed. London: John Wiley & Sons, Ltd.
 
 :::
 
@@ -419,19 +451,11 @@ Enter **prior predictive checks**.
 
 The basic idea is that we can capitalise on Bayesian models' capacity as generative models to check whether different priors generate sensible data.
 
-A toy example to illustrate the principle:
+We tried it out for ourselves yesterday.
+But luckily, brms automates this for us!
 
-- Suppose that our likelihood is a normal distribution with mean $\mu$ and standard deviation $\sigma$: $Normal(\mu, \sigma)$.
-- Suppose that $\mu \sim Normal(0, 1.5)$ and $\sigma \sim Uniform(0, 5)$; these are the priors.
-- To get one prior predictive observation: 
-  - For $\mu$, sample one value $a$ from $Normal(0, 1.5)$.
-  - For $\sigma$, sample one value $b$ from $Uniform(0, 5)$.
-  - These together define the likelihood $Normal(a, b)$. Sample one value from this distribution.
-- Do this a vast number of times to yield a prior predictive distribution.
-
-Luckily, brms automates this for us!
-We'll set up models with a few different priors and use them to generate fake data.
-Then we'll look at that fake data and see whether it looks fair.
+We'll set up models with a few different priors and use them to generate simulated data.
+Then we'll look at that simulated data and see whether it looks fair.
 For us, "fair" means not too restricted—we want permissive priors (see Cromwell's Rule above).
 This process is called "prior prediction" or "doing prior predictive checks".
 (We'll also do "posterior predictive checks" after fitting the model—stay tuned.)
@@ -528,11 +552,13 @@ Adapt the code above to fit a few more prior predictive models using these prior
 
 (and any others you want to try!)
 
-For each model, generate a summary histogram using `pp_check()`.
-Which of these priors produces the most even-looking distribution of outcome means?
-Is that the prior we'll want to use?
+For each model, generate a summary histogram using `pp_check()`, and then have a think about the following questions:
 
-Once you have your own thoughts on these questions, uncollapse this box to have a look at mine:
+- Which of these priors produces the most even-looking distribution of outcome means?
+- Is that the prior we'll want to use?
+- What effect sizes do each of these priors consider reasonable?
+
+Once you've gathered your own thoughts, uncollapse this box to have a look at mine:
 
 ::: {.callout-note collapse="true"}
 #### Prior predictive distributions
@@ -621,12 +647,17 @@ pp_5 <- pp_check(priorpred5,
 (pp_1 + pp_01)
 ```
 
-The spread, perhaps counterintuitively, is most even with the narrowest prior, and gets progressively more skewed as the prior gets more variable.
-We do want a fairly even spread, but we can use our domain knowledge to say that effects on the order of $Normal(0, 0.1)$ are probably too small to be realistic.
-(By definition, 95% of these will fall between [–0.2, 0.2] log-odds—that's nothing!)
 
-The next-best prior is $Normal(0, 1)$: broader, but still decently uniform posterior predictive means.
-This is the prior we'll use, and now our final model is:
+**When choosing between these priors, we need to balance an even spread of plausible values with a reasonable effect size.**
+
+The spread, perhaps counterintuitively, is most even with the narrowest prior, $Normal(0, 0.1)$.
+But 95% of the plausible values in this prior fall within the range of about [–0.2, 0.2] log-odds—that's nothing!
+
+If we move one step broader and consider $Normal(0, 1)$, we still have a decently uniform spread of prior predictive means, and now 95% of plausible effect sizes are between [–2, 2] log-odds. 
+That's better.
+
+And the broader priors produce more skewed distributions, so we'll stick with $Normal(0, 1)$.
+Our final model is:
 
 $$
 \begin{aligned}
@@ -644,14 +675,9 @@ $$
 
 ## Summary: The model-building workflow
 
-<!-- TODO finish summary -->
+1. Find a **likelihood** suitable for the outcome data.
 
-- **Likelihood:** How is the outcome data distributed?
+2. Identify the **parameters** required for the model you want to fit.
 
-  - Bernoulli, since our data is binary (0 and 1 are our outcomes).
-  
-  
-- **Priors:** How are the model's parameters distributed?
-
- -  Weakly regularising priors that don't restrict the model's estimates, following Cromwell's Rule.
+3. Use prior predictive checks to find plausible **priors** for each of those parameters.
 

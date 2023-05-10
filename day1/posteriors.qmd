@@ -1,0 +1,67 @@
+---
+title: "Interpreting posteriors"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = here::here())
+
+library(tidyverse)
+library(patchwork)
+library(extrafont)
+loadfonts()
+
+# To solve some conflicts between packages
+select <- dplyr::select
+
+# dplyr and ggplot settings
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_classic())
+theme_update(text = element_text(family = "Fira Sans", size=12),
+             axis.title.y = element_text(angle=0, vjust=0.5, hjust=0))
+
+cbpalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+update_palette <- c("#ADE1FF", "#0072B2")  # prior, posterior
+```
+
+
+Here's how the posterior distribution of the uniform-prior model looks after observing 80 successes out of 100 trials:
+
+```{r pstr-dens}
+# The possible values for theta, the probability of success.
+theta <- seq(0, 1, 0.001)
+
+# Create the density function for 80 successes, 20 failures, over theta.
+dens <- dbeta(theta, 80, 20)
+
+tibble(
+  theta = theta,
+  dens = dens
+) %>%
+  ggplot(aes(x = theta, y = dens)) +
+  # geom_density(fill = 'grey', alpha = 0.5, stat='identity') +
+  geom_line(colour = update_palette[2]) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+  ) +
+  labs(
+    y = 'Probability\ndensity',
+    x = 'Probability of answering correctly (theta)'
+  ) +
+  scale_x_continuous(breaks=seq(0, 1, 0.2)) +
+  NULL
+```
+
+The x axis shows every possible probability for answering the lexical decision task correctly.
+The model allocates its belief over these probabilities based on the data we observed and the prior beliefs we encoded.
+
+The posterior probability distribution therefore shows the model's belief about **how likely different probabilities are to be the true probability that generated the data.**
+
+Here, the model considers probabilities of success between about 0.7 and 0.9 to be the most plausible, given the observed data and our uniform prior beliefs.
+
+**We usually report posterior distributions by summarising their central tendency and dispersion.**
+
+- Central tendency: **mean or median** (depending on how skewed the distribution is).
+- Dispersion: conventionally, the **95% Credible Interval.**
+

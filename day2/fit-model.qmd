@@ -1,5 +1,5 @@
 ---
-title: "Fitting the model"
+title: "Fitting and checking the model"
 ---
 
 ```{r setup, include=FALSE}
@@ -32,11 +32,9 @@ acc <- read_csv('../data/acceptance.csv') %>%
 
 On this page, we'll focus on:
 
-1. **Fitting the model** (yay!)
+1. **Fitting the model** (finally!)
 2. **A couple diagnostics** for checking model convergence.
 3. **Posterior predictive checks:** How well does the model capture the generative process behind the data?
-
-Then on the next page, we'll use what we learned yesterday about how to interpret posterior probabilities to finally interpret and report the model's results.
 
 
 ## Our model
@@ -71,8 +69,9 @@ acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
 
 
 Copy this code into your notebook and run it to finally fit our model 🥳
+(It might take a minute or two, so be patient.)
 
-```{r}
+```{r echo=TRUE}
 acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
                data = acc,
                family = bernoulli(),
@@ -83,20 +82,18 @@ acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
                backend = 'cmdstanr',
                file = '../data/models/acc_fit'
 )
-
-summary(acc_fit)
 ```
 
 
 
 # Checking convergence
 
-Recall from yesterday that the Markov Chain Monte Carlo chains that sample from the posterior are skating around the posterior landscape, trying to find where the posterior probability mass is.
-It's possible that they never find it, or might not do so reliably.
-When the chains don't correctly sample from the posterior, we say the model has not converged.
+Recall from yesterday that the Markov Chain Monte Carlo chains that sample from the posterior are moving around the posterior landscape, trying to find where the bulk of the probability mass is.
+Sometimes they might never find it, or might not do so reliably.
+When the chains don't properly sample from the posterior, we say the model has not converged.
 
-We want the chains to "mix": in other words, all four chains should be sampling from the same posterior.
-There are a couple ways to tell that this is working as it should.
+Ideally, the chains will "mix": in other words, all four chains will be sampling from the same region of the posterior.
+There are a couple ways to tell that the chains are mixing properly.
 
 
 ## "Fat hairy caterpillars"
@@ -108,13 +105,13 @@ mcmc_trace(acc_fit,
            pars = c('b_Intercept', 'b_cond', 'b_sent', 'b_condsent'))
 ```
 
-Trace plots show the traces of the four chains as they traversed the posterior during sampling.
+Trace plots track where the four chains were as they traversed the posterior during sampling.
 The y axis represents the values of the posterior, and the x axis shows the sample indices (each chain drew 1,000 samples).
 
 If the chains mixed well, then in the words of Shravan Vasishth, the trace plots should look like "fat hairy caterpillars".
 And these ones do!
 
-For comparison, here's an example of some that don't.
+For comparison, here's an example of some that don't so much.
 
 ```{r bad-trace}
 badfit <- brm(sentence_accepted ~ cond + sent + condsent,
@@ -135,7 +132,7 @@ mcmc_trace(badfit,
 ```
 
 These still mix a little, but they don't overlap quite as densely as the previous ones.
-In even worse scenarios, you might also sometimes see chains that get stuck in one part of the posterior and never mingle with the others.
+In even worse scenarios, you might also sometimes see chains that get stuck in one part of the posterior and never mingle with the others: these show up as a straight horizontal line on a trace plot.
 But as long as your trace plots look like fat hairy caterpillars, then that's a good first sign 🐛
 
 
@@ -147,17 +144,17 @@ Rhat is a measure of how well the chains have mixed.
 It compares the estimates within chains and between chains, and if the chains have mixed well, then the result should be near 1.
 We consider the model to have converged if all Rhat values are equal to 1.00; even an Rhat of 1.01 should make you suspicious.
 
-If we display the summary of our model, then there will be a column called Rhat; all values should be equal to 1.00.
-(We'll look at the other values soon!)
+In the model summary, there is a column called Rhat.
+All values in this column should be equal to 1.00.
+(We'll look at the other values in this table on the next page!)
 
-```{r}
+```{r echo=TRUE}
 summary(acc_fit)
 ```
 
-And so they are!
-
 If there is any Rhat value greater than 1.00, then it means the chains didn't mix well enough, and we cannot trust the posterior estimates we've been given.
 For reference, the model that yielded the bad trace plot above had Rhats = 1.04.
+But these ones look pretty good!
 
 **If you do ever fit a model that yields Rhat > 1.00, [this page](https://mc-stan.org/misc/warnings.html) offers some solutions you could try.**
 
@@ -175,13 +172,14 @@ We've encountered the concept of predictive checks before.
 
 In fact, the processes are so similar that we can use `pp_check()` again to give us the means of the posterior predictive distributions, and compare them to the mean of the observed data:
 
-```{r pstr-pred, message=FALSE}
+```{r pstr-pred, message=FALSE, echo=TRUE}
 pp_check(acc_fit, type = 'stat', stat = mean)
 ```
 
 The mean of our observed data (the dark vertical line) is smack in the middle of the posterior predictive distribution of means—hurray!
 That's what we want to see.
-If the observed data were far away from the bulk of the posterior predictive distribution, then that would suggest that we might want to change the model architecture to better reflect the generative process behind the data.
+
+A little bit off to either side is also OK, but if the observed data were far away from the bulk of the posterior predictive distribution, then that would suggest that we might want to change the model architecture to better reflect the generative process behind the data.
 
 Reassured that the model does a decent job of capturing the data, we continue to the Grand Finale: interpreting and reporting the model's results.
 

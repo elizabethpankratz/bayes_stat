@@ -21,22 +21,35 @@ website:
       - file: resources.qmd
         text: "Resources"
 
+
   sidebar:
     - title: "Day 1"
       style: "docked"
       contents:
         - file: day1/learningobj.qmd
           text: "Learning objectives"
-        - day1/day1-1.qmd
-        - day1/day1-2.qmd
+        - day1/example.qmd
+        - day1/probable-probs.qmd
+        - day1/unif-prior.qmd
+        - day1/informative-prior.qmd
+        - file: day1/dancing-pstrs.qmd
+          text: "Dancing posteriors"
+        - file: day1/interim-summary.qmd
+          text: "Interim summary"
+        - day1/posteriors.qmd
+        - day1/cri.qmd
+        - day1/mcmc.qmd
+        - day1/generative-models.qmd
         - day1/day1-recap.qmd
     - title: "Day 2"
       style: "docked"
       contents:
         - file: day2/learningobj.qmd
           text: "Learning objectives"
-        - day2/day2-1.qmd
-        - day2/day2-2.qmd
+        - day2/setup.qmd
+        - day2/build-model.qmd
+        - day2/fit-model.qmd
+        - day2/report-model.qmd
         - day2/day2-recap.qmd
 
   page-navigation: true

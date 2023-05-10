@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Bayes, stat! - Recap</title>
+<title>Bayes, stat! - Day 1 Recap</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../day1/day1-2.html" rel="prev">
+<link href="../day1/generative-models.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -108,7 +108,7 @@ ul.task-list li input[type="checkbox"] {
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Recap</h1>
+      <h1 class="quarto-secondary-nav-title">Day 1 Recap</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -128,17 +128,57 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../day1/day1-1.html" class="sidebar-item-text sidebar-link">Bayesian reasoning</a>
+  <a href="../day1/example.html" class="sidebar-item-text sidebar-link">Example: Lexical decision task data</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../day1/day1-2.html" class="sidebar-item-text sidebar-link">Day 1 subpage 2</a>
+  <a href="../day1/probable-probs.html" class="sidebar-item-text sidebar-link">Probable probabilities</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../day1/day1-recap.html" class="sidebar-item-text sidebar-link active">Recap</a>
+  <a href="../day1/unif-prior.html" class="sidebar-item-text sidebar-link">A uniform prior</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day1/informative-prior.html" class="sidebar-item-text sidebar-link">An informative prior</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day1/dancing-pstrs.html" class="sidebar-item-text sidebar-link">Dancing posteriors</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day1/interim-summary.html" class="sidebar-item-text sidebar-link">Interim summary</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day1/posteriors.html" class="sidebar-item-text sidebar-link">Interpreting posteriors</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day1/cri.html" class="sidebar-item-text sidebar-link">95% Credible Intervals</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day1/mcmc.html" class="sidebar-item-text sidebar-link">Finding posteriors through sampling</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day1/generative-models.html" class="sidebar-item-text sidebar-link">Bayesian models as generative models</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day1/day1-recap.html" class="sidebar-item-text sidebar-link active">Day 1 Recap</a>
   </div>
 </li>
     </ul>
@@ -146,21 +186,14 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#today" id="toc-today" class="nav-link active" data-scroll-target="#today">Today</a></li>
-  <li><a href="#overall-workflow-for-a-bayesian-analysis" id="toc-overall-workflow-for-a-bayesian-analysis" class="nav-link" data-scroll-target="#overall-workflow-for-a-bayesian-analysis">Overall workflow for a Bayesian analysis</a></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Recap</h1>
+<h1 class="title d-none d-lg-block">Day 1 Recap</h1>
 </div>
 
 
@@ -175,22 +208,31 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="today" class="level2">
-<h2 class="anchored" data-anchor-id="today">Today</h2>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-</section>
-<section id="overall-workflow-for-a-bayesian-analysis" class="level2">
-<h2 class="anchored" data-anchor-id="overall-workflow-for-a-bayesian-analysis">Overall workflow for a Bayesian analysis</h2>
+<p><strong>How are beliefs about the world formalised?</strong></p>
 <ul>
-<li>Decide on an appropriate likelihood function.</li>
-<li>Decide on priors for all parameters in the likelihood function.</li>
-<li>Use the model that results from this combination of likelihood and priors to derive the posterior distribution of each parameter.</li>
-<li>Draw inferences about your research question absed on the posterior distribution of the parameter of interest.</li>
+<li>As probability distributions over the possible values that the parameter in question could take on.</li>
 </ul>
-<p>We’ll see this in action tomorrow!</p>
+<p><strong>How do different priors influence a model’s estimates?</strong></p>
+<ul>
+<li>Models with uninformative priors learn more from the data than do models with informative priors.</li>
+<li>But as the amount of data grows, the influence of the prior wanes.</li>
+</ul>
+<p><strong>How do we interpret a posterior probability distribution?</strong></p>
+<ul>
+<li>It tells us how probable each possible parameter value is, given the data and the priors.</li>
+<li>The 95% Credible Interval gives us the range in which the model is 95% certain that the true value lies.</li>
+</ul>
+<p><strong>How does the model find the posterior distribution?</strong></p>
+<ul>
+<li>brms models use an algorithm called Markov Chain Monte Carlo to approximate the posterior by drawing many samples from it.</li>
+</ul>
+<p><strong>How do Bayesian models generate data?</strong></p>
+<ul>
+<li>The likelihood’s parameter values can be sampled from the prior distributions.</li>
+<li>And then we sample from the likelihood to generate one data point.</li>
+</ul>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -443,8 +485,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../day1/day1-2.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Day 1 subpage 2</span>
+      <a href="../day1/generative-models.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Bayesian models as generative models</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

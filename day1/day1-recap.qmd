@@ -2,16 +2,25 @@
 title: "Day 1 Recap"
 ---
 
-## Today
+**How are beliefs about the world formalised?**
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+- As probability distributions over the possible values that the parameter in question could take on.
 
+**How do different priors influence a model's estimates?**
 
-## Overall workflow for a Bayesian analysis
+- Models with uninformative priors learn more from the data than do models with informative priors.
+- But as the amount of data grows, the influence of the prior wanes.
 
-- Decide on an appropriate likelihood function.
-- Decide on priors for all parameters in the likelihood function.
-- Use the model that results from this combination of likelihood and priors to derive the posterior distribution of each parameter.
-- Draw inferences about your research question absed on the posterior distribution of the parameter of interest.
+**How do we interpret a posterior probability distribution?**
 
-We'll see this in action tomorrow!
+- It tells us how probable each possible parameter value is, given the data and the priors.
+- The 95% Credible Interval gives us the range in which the model is 95% certain that the true value lies.
+
+**How does the model find the posterior distribution?**
+
+- brms models use an algorithm called Markov Chain Monte Carlo to approximate the posterior by drawing many samples from it.
+
+**How do Bayesian models generate data?**
+
+- The likelihood's parameter values can be sampled from the prior distributions.
+- And then we sample from the likelihood to generate one data point.

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Bayes, stat! - Day 2 subpage 1</title>
+<title>Bayes, stat! - Notation</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,8 +30,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../day2/day2-2.html" rel="next">
-<link href="../day2/learningobj.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -63,11 +61,12 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../styles.css">
 </head>
 
-<body class="nav-sidebar docked nav-fixed">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -92,7 +91,7 @@ ul.task-list li input[type="checkbox"] {
  <span class="menu-text">Day 1</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../day2/learningobj.html" aria-current="page">
+    <a class="nav-link" href="../day2/learningobj.html">
  <span class="menu-text">Day 2</span></a>
   </li>  
   <li class="nav-item">
@@ -107,60 +106,20 @@ ul.task-list li input[type="checkbox"] {
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Day 2 subpage 1</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
-      </button>
-    </div>
-  </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation docked overflow-auto">
-    <div class="sidebar-menu-container"> 
-    <ul class="list-unstyled mt-1">
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../day2/learningobj.html" class="sidebar-item-text sidebar-link">Learning objectives</a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../day2/day2-1.html" class="sidebar-item-text sidebar-link active">Day 2 subpage 1</a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../day2/day2-2.html" class="sidebar-item-text sidebar-link">Day 2 subpage 2</a>
-  </div>
-</li>
-        <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../day2/day2-recap.html" class="sidebar-item-text sidebar-link">Recap and take-aways</a>
-  </div>
-</li>
-    </ul>
-    </div>
-</nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#subpage-1" id="toc-subpage-1" class="nav-link active" data-scroll-target="#subpage-1">Subpage 1</a></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Day 2 subpage 1</h1>
+<h1 class="title">Notation</h1>
 </div>
 
 
@@ -175,12 +134,79 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="subpage-1" class="level2">
-<h2 class="anchored" data-anchor-id="subpage-1">Subpage 1</h2>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+<p>Let’s formalise the two models we’ve just seen using some standard notation.</p>
+<p><strong>The model with the uniform prior:</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{correct} &amp;\sim Bernoulli(\theta) \\
+\theta &amp;\sim Beta(1, 1)
+\end{aligned}
+\]</span></p>
+<p><strong>The model with the prior around chance:</strong></p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{correct} &amp;\sim Bernoulli(\theta) \\
+\theta &amp;\sim Beta(20, 20)
+\end{aligned}
+\]</span></p>
+<ul>
+<li>The distribution that the data, <span class="math inline">\(\text{correct}\)</span>, follows is called the <strong>likelihood.</strong>
+<ul>
+<li>Here, it’s <span class="math inline">\(Bernoulli(\theta)\)</span>.</li>
+</ul></li>
+<li>The distribution that the model-internal parameter <span class="math inline">\(\theta\)</span> follows is called the <strong>prior.</strong>
+<ul>
+<li>Here, it’s <span class="math inline">\(\theta \sim Beta(x, y)\)</span>.</li>
+</ul></li>
+</ul>
+<div class="callout-tip callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+The many shapes of the beta distribution
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Here are some examples of how beta distributions can look:</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="notation_files/figure-html/beta-plots-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout-tip callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+The beta-binomial conjugate case, or, why not Uniform(0, 1)?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>We could just as easily have specified the first model as:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\text{correct} &amp;\sim Bernoulli(\theta) \\
+\theta &amp;\sim Uniform(0, 1)
+\end{aligned}
+\]</span></p>
+<p>But we like to use beta priors for a binomial (Bernoulli) outcome because this is an example of a <a href="https://vasishth.github.io/bayescogsci/book/ch-introBDA.html">conjugate case</a>.</p>
+<p>A conjugate case is a kind of model where the posterior and the prior belong to the same distribution, as long as a particular likelihood is used. Here, with a Bernoulli likelihood, both prior and posterior belong to beta distributions: the so-called “beta-binomial conjugate case”.</p>
+<p>So, for internal consistency, I’m using beta priors throughout.</p>
+</div>
+</div>
+</div>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -431,18 +457,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script>
-<nav class="page-navigation">
-  <div class="nav-page nav-page-previous">
-      <a href="../day2/learningobj.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Learning objectives</span>
-      </a>          
-  </div>
-  <div class="nav-page nav-page-next">
-      <a href="../day2/day2-2.html" class="pagination-link">
-        <span class="nav-page-text">Day 2 subpage 2</span> <i class="bi bi-arrow-right-short"></i>
-      </a>
-  </div>
-</nav>
 </div> <!-- /content -->
 
 

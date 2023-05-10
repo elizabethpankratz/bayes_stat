@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Bayes, stat! - Recap and take-aways</title>
+<title>Bayes, stat! - Day 2 Recap</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -30,7 +30,7 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../day2/day2-2.html" rel="prev">
+<link href="../day2/report-model.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
@@ -108,7 +108,7 @@ ul.task-list li input[type="checkbox"] {
     </nav>
   <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
     <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Recap and take-aways</h1>
+      <h1 class="quarto-secondary-nav-title">Day 2 Recap</h1>
       <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
         <i class="bi bi-chevron-right"></i>
       </button>
@@ -128,17 +128,27 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../day2/day2-1.html" class="sidebar-item-text sidebar-link">Day 2 subpage 1</a>
+  <a href="../day2/setup.html" class="sidebar-item-text sidebar-link">Getting set up</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../day2/day2-2.html" class="sidebar-item-text sidebar-link">Day 2 subpage 2</a>
+  <a href="../day2/build-model.html" class="sidebar-item-text sidebar-link">Building the model</a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../day2/day2-recap.html" class="sidebar-item-text sidebar-link active">Recap and take-aways</a>
+  <a href="../day2/fit-model.html" class="sidebar-item-text sidebar-link">Fitting and checking the model</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day2/report-model.html" class="sidebar-item-text sidebar-link">Interpreting and reporting model results</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../day2/day2-recap.html" class="sidebar-item-text sidebar-link active">Day 2 Recap</a>
   </div>
 </li>
     </ul>
@@ -146,21 +156,14 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#recap-of-today" id="toc-recap-of-today" class="nav-link active" data-scroll-target="#recap-of-today">Recap of today</a></li>
-  <li><a href="#take-aways" id="toc-take-aways" class="nav-link" data-scroll-target="#take-aways">Take-aways</a></li>
-  </ul>
-</nav>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Recap and take-aways</h1>
+<h1 class="title d-none d-lg-block">Day 2 Recap</h1>
 </div>
 
 
@@ -175,31 +178,32 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="recap-of-today" class="level2">
-<h2 class="anchored" data-anchor-id="recap-of-today">Recap of today</h2>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-</section>
-<section id="take-aways" class="level2">
-<h2 class="anchored" data-anchor-id="take-aways">Take-aways</h2>
+<p><strong>What is the workflow for running a Bayesian analysis?</strong></p>
 <ul>
-<li>Practice dealing with uncertainty.</li>
-<li>What does a frequentist model do that a Bayesian model does not do? NHST vs.&nbsp;effect size estimation.
+<li>Find a suitable likelihood.</li>
+<li>Identify the parameters in the model.</li>
+<li>Find appropriate priors (using, e.g., prior predictive checks).</li>
+<li>Fit the model.</li>
+<li>Check convergence.</li>
+<li>Compare posterior predictive distributions to the true data.</li>
+<li>If the model is off: Tweak it and begin again. Else: Report!</li>
+</ul>
+<p><strong>How do we fit a Bayesian model using brms?</strong></p>
 <ul>
-<li>What is the difference between effect size estimation and hypothesis testing?
+<li>Actually much like we would with lme4-based analyses!</li>
+<li>And with a little more patience.</li>
+</ul>
+<p><strong>How do we check that it’s a good model?</strong></p>
 <ul>
-<li>What options are out there for Bayesian hypothesis testing?</li>
-</ul></li>
-</ul></li>
-<li>What does a Bayesian model do that a frequentist model does not do?
+<li>To check convergence, we use diagnostics like trace plots (🐛) and Rhat values.</li>
+<li>To see whether the model adequately captures the generative process behind the data, we compare data that the model generates to the true data we observed using posterior predictive checks.</li>
+</ul>
+<p><strong>How would we report the results in a publication?</strong></p>
 <ul>
-<li>Licenses more flexible interpretations, since we’re not stuck in the binary of “reject the null or not”.</li>
-</ul></li>
-<li>Why do some people prefer Bayesian analyses?</li>
-<li>Why is Bayes currently up and coming? / Why are frequentist models the standard?</li>
+<li>Parameter estimates can be reported similarly to how you would report a frequentist model, bearing in mind that we are not rejecting any nulls, nor are we finding evidence for any effects.</li>
 </ul>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -452,8 +456,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../day2/day2-2.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Day 2 subpage 2</span>
+      <a href="../day2/report-model.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Interpreting and reporting model results</span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

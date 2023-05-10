@@ -25,6 +25,18 @@ update_palette <- c("#ADE1FF", "#0072B2")  # prior, posterior
 # update_palette <- c("#FFE09E", "#E69F00")  # prior, posterior
 ```
 
+Recall that, across all 100 observations,
+
+$$
+\text{correct} = \frac{80}{100}
+$$
+
+
+- Do the posteriors eventually approach this proportion?
+- How does the updating process differ when we start with different priors?
+
+**Let's have a look:**
+
 ```{r eval=FALSE}
 generate_betabinom_plots <- function(prior_a, prior_b, bernoulli_obs, ymax, obs_in_title){
   # Args:
@@ -127,11 +139,4 @@ gifski::save_gif(make_many_plots(), path_to_gif, 1000, 720, res = 144, delay=0.1
 
 ![](../imgs/lotsofdata.gif)
 
-Recall that, across all 100 observations,
 
-$$
-\text{correct} = \frac{80}{100}
-$$
-
-
-How is this reflected in each of these updating processes?
