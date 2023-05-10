@@ -4,11 +4,13 @@ title: "Learning objectives for Day 1"
 
 - How does Bayesian reasoning work?
 <!-- a prior belief + Bayesian updating -->
-- What's the anatomy of a Bayesian model?
+- What's the anatomy of an inferential Bayesian model?
 <!-- Data ~ Likelihood(params) -->
 <!-- params ~ priors -->
 - How do different priors influence the model's estimates?
 <!-- lots with little data -->
 <!-- less with more data -->
-- How does Bayesian inference differ from frequentist inference?
+- How does the model work out the posterior?
+<!-- - How does Bayesian inference differ from frequentist inference? -->
 <!-- discussed along the way, but show overview table at end -->
+- How do Bayesian models generate data?

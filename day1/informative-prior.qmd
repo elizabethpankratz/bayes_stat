@@ -1,0 +1,186 @@
+---
+title: "An informative prior"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = here::here())
+
+library(tidyverse)
+library(patchwork)
+library(extrafont)
+loadfonts()
+
+# To solve some conflicts between packages
+select <- dplyr::select
+
+# dplyr and ggplot settings
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_classic())
+theme_update(text = element_text(family = "Fira Sans", size=12),
+             axis.title.y = element_text(angle=0, vjust=0.5, hjust=0))
+
+cbpalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+update_palette <- c("#ADE1FF", "#0072B2")  # prior, posterior
+# update_palette <- c("#FFE09E", "#E69F00")  # prior, posterior
+```
+
+```{r}
+generate_betabinom_plots <- function(prior_a, prior_b, bernoulli_obs, ymax, obs_in_title){
+  # Args:
+  #   prior_a = int, number of successes seen a priori (parameter a of beta distrib)
+  #   prior_b = int, number of failures seen a priori  (parameter b of beta distrib)
+  #   bernoulli_obs = vector of 0,1 observations
+  #   ymax = num, the max y value of the density plot to be used throughout
+  #   obs_in_title = bool, True if obs list in title, False if not
+  # Returns:
+  #   list of ggplot objects, one per observation, showing how that observation 
+  #   updates the posterior
+  
+  # Init str that'll be put in plot title.
+  obs_so_far_str = ''
+  
+  # Create a list that'll collect the plots we create below.
+  plot_accum <- list()
+  
+  for(curr_obs_idx in 1:length(bernoulli_obs)){
+    
+    # Add current observation to list of observations.
+    curr_obs <- bernoulli_obs[curr_obs_idx]
+    
+    # This shortcut works because of the beta-binomial conjugate case
+    pstr_a <- prior_a + curr_obs      # a + k, the number of successes
+    pstr_b <- prior_b + 1 - curr_obs  # b + n (number of trials) - k (number of successes)
+    
+    # Generate prior and posterior beta distributions.
+    prior <- dbeta(theta, prior_a, prior_b)
+    pstr <- dbeta(theta, pstr_a, pstr_b)
+    
+    if(obs_in_title){
+      obs_so_far_str <- paste(obs_so_far_str, curr_obs)
+      title_str <- paste('Observed:', obs_so_far_str)
+    }else{
+      title_str <- ''
+    }
+    
+    # Plot the current posterior overtop of the current prior (last posterior).
+    len_theta <- length(theta)  # for some reason, col has weird length when this is included below
+    curr_plot <- tibble(
+      theta = rep(theta, 2),
+      dens = c(prior, pstr),
+      distrib = rep(c('prior', 'posterior'), each = len_theta)
+    ) %>% 
+      mutate(distrib = factor(distrib, levels = c('prior', 'posterior'))) %>% 
+      ggplot(aes(x = theta, y = dens, colour = distrib)) +
+      geom_line() +
+      theme(
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        legend.position = 'none'
+      ) +
+      labs(
+        y = 'Prob.\ndens.',
+        title = title_str) +
+      scale_colour_manual(values = update_palette) +
+      ylim(0, ymax)
+    curr_plot 
+    
+    plot_accum[[curr_obs_idx]] <- curr_plot
+    
+    # Use these posterior values as next iteration's prior values.
+    prior_a <- pstr_a
+    prior_b <- pstr_b
+  }
+  
+  # All plots have been created; return list.
+  return(plot_accum)
+}
+```
+
+```{r}
+# The possible values for theta, the probability of success.
+theta <- seq(0, 1, 0.001)
+
+# The sequence of observations yielding 80 successes out of 100 trials.
+set.seed(1)
+obs_seq_100 <- sample(c(rep(1, 80), rep(0, 20)))
+inform_plot_list <- generate_betabinom_plots(20, 20, obs_seq_100[1:10], ymax = 5.75,  obs_in_title = TRUE)
+```
+
+```{r eval=FALSE}
+# Make a function that returns a bunch of ggplot objects for use in save_gif() below.
+# More info: https://rdrr.io/cran/gifski/man/gifski.html 
+make_inform_plots <- function(){
+  for(plot_idx in 1:length(inform_plot_list)){
+    print(inform_plot_list[[plot_idx]])
+  }
+}
+
+path_to_gif <- paste0(getwd(), '/imgs/inform_prior.gif')
+gifski::save_gif(make_inform_plots(), path_to_gif, 1000, 720, res = 144, delay=0.5)
+```
+
+
+
+We might also have entered the experiment with a belief (for whatever reason) that participants will perform **around chance**.
+
+**Before uncollapsing this box,** think about what a prior that reflects this belief might look like.
+
+::: {.callout-note collapse="true"}
+#### A prior for success around chance
+
+```{r inform-prior}
+# The possible values for theta, the probability of success.
+theta <- seq(0, 1, 0.001)
+
+# Create a more informative density centered at 0.5.
+dens <- dbeta(theta, 20, 20)
+
+tibble(
+  theta = theta,
+  dens = dens
+) %>%
+  ggplot(aes(x = theta, y = dens)) +
+  geom_line(colour = update_palette[2]) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+  ) +
+  labs(
+    y = 'Probability\ndensity',
+    x = 'Probability of answering correctly (theta)'
+  ) +
+  NULL
+```
+
+:::
+
+
+Now, we observe the first trial, a success.
+
+Think again about **how you expect the posterior to look** before uncollapsing this next box.
+
+::: {.callout-note collapse="true"}
+#### After observing one successful trial
+
+```{r plot-obs1, message=FALSE}
+inform_plot_list[[1]] +
+  labs(caption = 'Observations: 1 = success, 0 = failure')
+```
+
+
+Did the posterior (dark blue) move as far from the prior (light blue) as you expected?
+
+:::
+
+
+Now let's watch data from the first ten trials come in.
+
+::: {.callout-note collapse="true"}
+#### The first ten trials
+
+![](../imgs/inform_prior.gif)
+:::
+
+
+How does this differ from the situation before, where we began with a uniform prior?

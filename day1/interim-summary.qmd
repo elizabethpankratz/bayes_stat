@@ -1,0 +1,14 @@
+---
+title: "Interim summary: The influence of priors"
+---
+
+**"Priors affect the posterior so much! Isn't that an unscientific way to do data analysis?"**
+
+- If you *were* gonna actively mess with your analysis, using priors would be an embarrassingly transparent way to do it.
+- **All analyses make assumptions, and all analyses are subjective.** 
+  Bayesian approaches let you formalise your assumptions and put them up for debate. 
+- Also: as the amount of data increases, the model's reliance on the priors decreases.
+
+<br>
+
+Any other questions?

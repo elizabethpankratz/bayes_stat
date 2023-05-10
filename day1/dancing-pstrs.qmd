@@ -1,0 +1,137 @@
+---
+title: "Dancing posteriors (😏)"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_knit$set(root.dir = here::here())
+
+library(tidyverse)
+library(patchwork)
+library(extrafont)
+loadfonts()
+
+# To solve some conflicts between packages
+select <- dplyr::select
+
+# dplyr and ggplot settings
+options(dplyr.summarise.inform = FALSE)
+theme_set(theme_classic())
+theme_update(text = element_text(family = "Fira Sans", size=12),
+             axis.title.y = element_text(angle=0, vjust=0.5, hjust=0))
+
+cbpalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+update_palette <- c("#ADE1FF", "#0072B2")  # prior, posterior
+# update_palette <- c("#FFE09E", "#E69F00")  # prior, posterior
+```
+
+```{r eval=FALSE}
+generate_betabinom_plots <- function(prior_a, prior_b, bernoulli_obs, ymax, obs_in_title){
+  # Args:
+  #   prior_a = int, number of successes seen a priori (parameter a of beta distrib)
+  #   prior_b = int, number of failures seen a priori  (parameter b of beta distrib)
+  #   bernoulli_obs = vector of 0,1 observations
+  #   ymax = num, the max y value of the density plot to be used throughout
+  #   obs_in_title = bool, True if obs list in title, False if not
+  # Returns:
+  #   list of ggplot objects, one per observation, showing how that observation 
+  #   updates the posterior
+  
+  # Init str that'll be put in plot title.
+  obs_so_far_str = ''
+  
+  # Create a list that'll collect the plots we create below.
+  plot_accum <- list()
+  
+  for(curr_obs_idx in 1:length(bernoulli_obs)){
+    
+    # Add current observation to list of observations.
+    curr_obs <- bernoulli_obs[curr_obs_idx]
+    
+    # This shortcut works because of the beta-binomial conjugate case
+    pstr_a <- prior_a + curr_obs      # a + k, the number of successes
+    pstr_b <- prior_b + 1 - curr_obs  # b + n (number of trials) - k (number of successes)
+    
+    # Generate prior and posterior beta distributions.
+    prior <- dbeta(theta, prior_a, prior_b)
+    pstr <- dbeta(theta, pstr_a, pstr_b)
+    
+    if(obs_in_title){
+      obs_so_far_str <- paste(obs_so_far_str, curr_obs)
+      title_str <- paste('Observed:', obs_so_far_str)
+    }else{
+      title_str <- ''
+    }
+    
+    # Plot the current posterior overtop of the current prior (last posterior).
+    len_theta <- length(theta)  # for some reason, col has weird length when this is included below
+    curr_plot <- tibble(
+      theta = rep(theta, 2),
+      dens = c(prior, pstr),
+      distrib = rep(c('prior', 'posterior'), each = len_theta)
+    ) %>% 
+      mutate(distrib = factor(distrib, levels = c('prior', 'posterior'))) %>% 
+      ggplot(aes(x = theta, y = dens, colour = distrib)) +
+      geom_line() +
+      theme(
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        legend.position = 'none'
+      ) +
+      labs(
+        y = 'Prob.\ndens.',
+        title = title_str) +
+      scale_colour_manual(values = update_palette) +
+      ylim(0, ymax)
+    curr_plot 
+    
+    plot_accum[[curr_obs_idx]] <- curr_plot
+    
+    # Use these posterior values as next iteration's prior values.
+    prior_a <- pstr_a
+    prior_b <- pstr_b
+  }
+  
+  # All plots have been created; return list.
+  return(plot_accum)
+}
+```
+
+
+```{r eval=FALSE}
+many_obs_unif <- generate_betabinom_plots(1, 1, obs_seq_100, ymax = 10.5, obs_in_title = FALSE)
+many_obs_inform <- generate_betabinom_plots(20, 20, obs_seq_100, ymax = 10.5, obs_in_title = FALSE)
+```
+
+```{r eval=FALSE}
+# Make a function that returns a bunch of ggplot objects for use in save_gif() below.
+# More info: https://rdrr.io/cran/gifski/man/gifski.html 
+make_many_plots <- function(){
+  
+  for(plot_idx in 1:length(many_obs_unif)){
+    curr_unif <- many_obs_unif[[plot_idx]] +
+      labs(title = 'Began with uniform prior',
+           subtitle = paste0('Observation ', plot_idx, '/100'))
+    curr_inform <- many_obs_inform[[plot_idx]] +
+      labs(title = 'Began with informative prior',
+           subtitle = paste0('Observation ', plot_idx, '/100'))
+    
+    print(curr_unif + curr_inform)
+  }
+}
+
+path_to_gif <- paste0(getwd(), '/imgs/lotsofdata.gif')
+gifski::save_gif(make_many_plots(), path_to_gif, 1000, 720, res = 144, delay=0.1)
+```
+
+
+![](../imgs/lotsofdata.gif)
+
+Recall that, across all 100 observations,
+
+$$
+\text{correct} = \frac{80}{100}
+$$
+
+
+How is this reflected in each of these updating processes?

@@ -1,5 +1,5 @@
 ---
-title: "Bayesian reasoning"
+title: "A uniform prior"
 ---
 
 ```{r setup, include=FALSE}
@@ -24,16 +24,6 @@ cbpalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00",
 update_palette <- c("#ADE1FF", "#0072B2")  # prior, posterior
 # update_palette <- c("#FFE09E", "#E69F00")  # prior, posterior
 ```
-
-```{r}
-# The possible values for theta, the probability of success.
-theta <- seq(0, 1, 0.005)
-
-# The sequence of observations yielding 80 successes out of 100 trials.
-set.seed(1)
-obs_seq_100 <- sample(c(rep(1, 80), rep(0, 20)))
-```
-
 
 ```{r}
 generate_betabinom_plots <- function(prior_a, prior_b, bernoulli_obs, ymax, obs_in_title){
@@ -108,15 +98,70 @@ generate_betabinom_plots <- function(prior_a, prior_b, bernoulli_obs, ymax, obs_
 ```
 
 
-```{r}
-unif_plot_list <- generate_betabinom_plots(1, 1, obs_seq_100[1:8], ymax = 3.5, obs_in_title = TRUE)
-inform_plot_list <- generate_betabinom_plots(20, 20, obs_seq_100[1:8], ymax = 5.75,  obs_in_title = TRUE)
+We might enter the experiment with **no expectations** about how well or how poorly participants will perform.
+
+```{r unif-prior}
+# The possible values for theta, the probability of success.
+theta <- seq(0, 1, 0.001)
+
+# Create a uniform density.
+dens <- dbeta(theta, 1, 1)
+
+tibble(
+  theta = theta,
+  dens = dens
+) %>%
+  ggplot(aes(x = theta, y = dens)) +
+  geom_line(colour = update_palette[2]) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.text.y = element_blank(),
+  ) +
+  labs(
+    y = 'Probability\ndensity',
+    x = 'Probability of answering correctly (theta)'
+  ) +
+  NULL
 ```
 
-Began with a uniform prior:
+
+Now, we observe one trial: **a success!**
+
+This **changes our belief about the probable probabilities of success:** we know it can't be zero, because we just saw a success.
+
+In fact, here's how our belief about every probability looks now, superimposed over our prior:
+
+```{r gen-obs-seq}
+# The sequence of observations yielding 80 successes out of 100 trials.
+set.seed(1)
+obs_seq_100 <- sample(c(rep(1, 80), rep(0, 20)))
+```
+
+```{r plot-obs1, message=FALSE}
+unif_5obs <- generate_betabinom_plots(1, 1, obs_seq_100[1:5], ymax = 3.5, obs_in_title = TRUE)
+unif_5obs[[1]] +
+  labs(caption = 'Observations: 1 = success, 0 = failure') +
+  ylim(0, 2)
+```
+
+<br>
+
+Let's let a couple more trials trickle in:
+
+```{r plot-obs2, warning=FALSE}
+unif_5obs[[2]] + labs(caption = 'Observations: 1 = success, 0 = failure')
+unif_5obs[[3]] + labs(caption = 'Observations: 1 = success, 0 = failure')
+```
+
+And even more...
+
+```{r}
+unif_plot_list <- generate_betabinom_plots(1, 1, obs_seq_100[1:10], ymax = 3.5, obs_in_title = TRUE)
+```
 
 ```{r animation.hook='gifski', warning=FALSE, eval=FALSE}
-# This code chunk creates a gif, but we won't use it because it makes loading the page take too long.
+# This code chunk creates a gif and displays it, 
+# but we won't use it because it makes loading the page take too long.
 for(plot_idx in 1:length(unif_plot_list)){
   print(unif_plot_list[[plot_idx]])
 }
@@ -132,62 +177,14 @@ make_unif_plots <- function(){
 }
 
 path_to_gif <- paste0(getwd(), '/imgs/unif_prior.gif')
-gifski::save_gif(make_unif_plots(), path_to_gif, 1000, 720, res = 144, delay=1)
+gifski::save_gif(make_unif_plots(), path_to_gif, 1000, 720, res = 144, delay=0.5)
 ```
 
 ![](../imgs/unif_prior.gif)
 
-Began with a prior saying we're pretty certain this is a fair coin:
+<br>
 
-```{r eval=FALSE}
-# Make a function that returns a bunch of ggplot objects for use in save_gif() below.
-# More info: https://rdrr.io/cran/gifski/man/gifski.html 
-make_inform_plots <- function(){
-  for(plot_idx in 1:length(inform_plot_list)){
-    print(inform_plot_list[[plot_idx]])
-  }
-}
+**What is happening here?**
 
-path_to_gif <- paste0(getwd(), '/imgs/inform_prior.gif')
-gifski::save_gif(make_inform_plots(), path_to_gif, 1000, 720, res = 144, delay=1)
-```
-
-![](../imgs/inform_prior.gif)
-
-How both of them look after eight observations:
-
-```{r}
-unif_plot_list[[8]] + inform_plot_list[[8]]
-```
-
-But if we do more than eight observations, and get up to 80/100:
-
-```{r eval=FALSE}
-many_obs_unif <- generate_betabinom_plots(1, 1, obs_seq_100, ymax = 10.5, obs_in_title = FALSE)
-many_obs_inform <- generate_betabinom_plots(20, 20, obs_seq_100, ymax = 10.5, obs_in_title = FALSE)
-```
-
-```{r eval=FALSE}
-# Make a function that returns a bunch of ggplot objects for use in save_gif() below.
-# More info: https://rdrr.io/cran/gifski/man/gifski.html 
-make_many_plots <- function(){
-  
-  for(plot_idx in 1:length(many_obs_unif)){
-    curr_unif <- many_obs_unif[[plot_idx]] +
-      labs(title = 'Began with uniform prior',
-           subtitle = paste0('Observation ', plot_idx, '/100'))
-    curr_inform <- many_obs_inform[[plot_idx]] +
-      labs(title = 'Began with informative prior',
-           subtitle = paste0('Observation ', plot_idx, '/100'))
-    
-    print(curr_unif + curr_inform)
-  }
-}
-
-path_to_gif <- paste0(getwd(), '/imgs/lotsofdata.gif')
-gifski::save_gif(make_many_plots(), path_to_gif, 1000, 720, res = 144, delay=0.1)
-```
-
-
-![](../imgs/lotsofdata.gif)
-
+<!-- Every posterior becomes the next observation's prior. -->
+<!-- The range of probable probabilities becomes narrower as we observe more data. -->
