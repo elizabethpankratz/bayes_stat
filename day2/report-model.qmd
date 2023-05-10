@@ -36,9 +36,7 @@ acc_fit <- brm(sentence_accepted ~ cond + sent + condsent,
 
 ## Summarising the posteriors
 
-The posterior distributions estimated by the model are sampled using MCMC.
-This essentially means that each parameter has a posterior distribution consisting of many individual sampled values.
-Like with any variable, we can compute summary statistics over these distributions; that's what `summary()` gives us.
+Time to delve into the actual estimates given by `summary()`!
 
 - Under `Estimate`, we get the mean of the posterior distribution of each parameter.
 - Under `Est.Error`, we get the standard deviation.
@@ -188,7 +186,7 @@ However, the 95% CrI contains positive values as well, indicating some uncertain
 > There is more certainty in the estimate of the much larger effect of sentence type ($\beta$ = 1.84 log-odds, 95\% CrI [–1.62, 2.08]); the model is sure that word order sentences are much more likely to be accepted than case-marking sentences are.
 >
 > Finally, we hypothesised that we would observe a negative interaction, with a larger difference between sentence types in the comprehension condition than the production condition.
-However, the coefficient that the model estimates is almost entirely positive ($\beta$ = 0.22, 95% CrI: [–0.01, 0.45]), giving much more credibility to an interaction going in the _opposite_ direction to the one we hypothesised.
+However, the coefficient that the model estimates is almost entirely positive ($\beta$ = 0.22, 95% CrI: [–0.01, 0.45]), giving much more credibility to an interaction going in the _opposite_ direction to the one we predicted.
 
 
 **Notice that _nowhere_ are we talking about "evidence" or "significance" or "rejecting the null".**
@@ -201,5 +199,7 @@ Rather, we're looking at the range of estimates that the 95% CrIs contain, and *
 ## Take-home message about interpreting Bayesian models
 
 The most that this Bayesian inferential model can do is **allocate its belief over a range of possible effects, of possible parameter values; we are not finding evidence for or against any effects or hypotheses.**
+
 This is a crucial thing to know and understand, and it might feel uncomfortable and nebulous at first.
-But the payoff to dealing with this uncertainty is a model that gives you much better interpretability.
+But the payoff to dealing with this uncertainty is **a model that is interpretable in more diverse, interesting ways,** since you're not limited to the binary decision of "reject the null" or "fail to reject the null".
+

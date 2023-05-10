@@ -48,7 +48,7 @@ $$
 
 The following procedure will let us use this model to generate one data point.
 
-- To generate data from the likelihood $Normal(\mu, \sigma)$, we need to define the currently-unknown parameters.
+- To generate data from the likelihood $Normal(\mu, \sigma)$, we need to define the currently-unknown parameters $\mu$ and $\sigma$.
   - For $\mu$, sample one value $a$ from $Normal(0, 1.5)$.
   - For $\sigma$, sample one value $b$ from $Uniform(0, 5)$.
 - Combine them to define the likelihood as $Normal(a, b)$.

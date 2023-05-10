@@ -26,7 +26,7 @@ acc <- read_csv('../data/acceptance.csv')
 
 ## Anatomy of a Bayesian model
 
-Recall from yesterday that a Bayesian model combines the **likelihood** of the data, given different hypotheses, with the **prior probabilities** of those hypotheses, to give us the **posterior probabilities** of how probable different hypotheses are, given the data.
+A Bayesian model combines the **likelihood** of the data, given different hypotheses, with the **prior probabilities** of those hypotheses, to give us the **posterior probabilities** of how probable different hypotheses are, given the data.
 
 When we're doing Bayesian inference, **these hypotheses correspond to different parameter values**: different values that the model's coefficients can plausibly take on.
 The priors over these parameter values define how plausible we think different values are *a priori*.
@@ -45,10 +45,10 @@ If you know that you can fit a basic linear model to continuous outcome data, bu
 **The likelihood function is selected based on the kinds of values that the outcome variable can take on.**
 Here are three common examples.
 
-### Gaussian (normal)
+### Normal (Gaussian)
 
-A continuous variable, such as formant values in Hz, can be said to follow a Gaussian distribution (a.k.a. a normal distribution).
-A Gaussian distribution looks something like this:
+A continuous variable, such as formant values in Hz, can be said to follow a normal distribution (aka a Gaussian distribution).
+A normal distribution looks something like this:
 
 ```{r plot-gaus}
 tibble(dat = rnorm(5*1e5)) %>% 
@@ -58,7 +58,7 @@ tibble(dat = rnorm(5*1e5)) %>%
   labs(
     x = element_blank(),
     y = 'Probability density',
-    title = 'Gaussian(0, 1)'
+    title = 'Normal(0, 1)'
   ) +
   theme(axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
@@ -68,22 +68,22 @@ tibble(dat = rnorm(5*1e5)) %>%
 
 
 
-So if we were modelling Hz, we would use a Gaussian likelihood, and we could write it like this:
+So if we were modelling Hz, we would use a normal likelihood, and we could write it like this:
 
 $$
-Hz \sim Gaussian(\mu, \sigma)
+Hz \sim Normal(\mu, \sigma)
 $$
 
-*"Hz is distributed according to a Gaussian distribution with mean $\mu$ and standard deviation $\sigma$."*
+*"Hz is distributed according to a normal distribution with mean $\mu$ and standard deviation $\sigma$."*
 
 ($\mu$ and $\sigma$ are parameters that define the distribution's shape: where its mean is located, and how spread-out the distribution is around that mean, respectively.)
 
-If you would use a basic linear model, not a generalised linear model, in your analysis, you would choose a Gaussian likelihood.
+If you would use a basic linear model, not a generalised linear model, in your analysis, you would choose a Normal likelihood.
 
 
 ### Log-normal
 
-A continuous variable that's positive-only and right-skewed, such as reaction times, might follow a Gaussian distribution only once it's been log-transformed. 
+A continuous variable that's positive-only and right-skewed, such as reaction times, might follow a normal distribution only once it's been log-transformed. 
 This means that, without any transformation, it follows a log-normal distribution.
 
 ```{r plot-lognorm, warning=FALSE}
@@ -128,13 +128,13 @@ $$
 
 *"RT is distributed according to a lognormal distribution with location $\mu$ and scale $\sigma$."*
 
-Equivalently, one could log-transform RTs and model them with a Gaussian likelihood:
+Equivalently, one could log-transform RTs and model them with a normal likelihood:
 
 $$
-\log(RT) \sim Gaussian(\mu, \sigma)
+\log(RT) \sim Normal(\mu, \sigma)
 $$
 
-This is how it's typically done in frequentist circles, but Bayesian models make it just as easy to use a lognormal likelihood as a Gaussian one.
+This is how it's typically done in frequentist circles, but Bayesian models make it just as easy to use a lognormal likelihood as a normal one.
 
 
 ### Bernoulli
@@ -171,7 +171,7 @@ But for the usual analyses in experimental linguistics, the three above will be 
 Now that we have a likelihood, the next step is to think about what priors our model needs.
 
 You saw that each of those likelihood functions above contains parameters that define their shape: $\mu$, $\sigma$, $\theta$.
-**Every parameter in a Bayesian model needs to have a prior** that tells the model which values are a priori plausible for that parameter to take on.
+**Every parameter in a Bayesian model needs to have a prior** that tells the model which values are *a priori* plausible for that parameter to take on.
 
 In this section, we build the model up bit by bit.
 This process will show us how many parameters our model has, and therefore what priors the model needs.
@@ -180,7 +180,7 @@ We'll start with the likelhood.
 To build up the model, we'll start off by defining the model's likelihood.
 
 
-We determined which likelihood we need above: acceptance $acc$ follows a Bernoulli distribution.
+We determined already which likelihood we need: acceptance $acc$ follows a Bernoulli distribution.
 
 $$acc \sim Bernoulli(\theta)$$
 
@@ -302,11 +302,11 @@ Let's walk through how to come up with weakly regularising priors for $\alpha$ a
 
 **TLDR: Your priors must match the order of magnitude of the space the model is fit in.**
 
-If the model's coefficient estimates are interpretable using the same units as the outcome (e.g., if you're using a Gaussian likelihood), then we can say that the model is "fit in the outcome space".
-If your model is fit in the outcome space, then you need to think about what **order of magnitude** our outcome variable has.
+If the model's coefficient estimates are interpretable using the same units as the outcome (e.g., if you're using a normal likelihood), then we can say that the model is "fit in the outcome space".
+If your model is fit in the outcome space, then you'll need to think about what **order of magnitude** your outcome variable has.
 
 - For example, if your outcome is raw reaction time, then your effects might be in the hundreds (of milliseconds).
-- But if your outcome is log reaction time, then your effects are probably in the single digits (of log units).
+- But if your outcome is *log* reaction time, then your effects are probably in the single digits (of log units).
 
 A weak prior on the log scale is an incredibly restrictive prior on the millisecond scale.
 So the prior has to match the order of magnitude of the outcome.
@@ -314,7 +314,7 @@ So the prior has to match the order of magnitude of the outcome.
 If the model is *not* fit in the outcome space—i.e., if the outcome is transformed into a different space, and then the linear model is fit there—we need to know what space the model is fit in.
 This is because **the priors have to be on the transformed scale,** not the outcome scale.
 
-In our case, our model has a logit link function that transforms probabilities into log-odds, and then the linear expression is fit in log-odds space.
+In our case, our model transforms probabilities into log-odds, and then the linear expression is fit in log-odds space.
 That means our priors have to be **on the log-odds scale**.
 
 
@@ -323,7 +323,7 @@ That means our priors have to be **on the log-odds scale**.
 
 $\alpha$ represents the intercept of our linear model.
 It is the outcome, in log-odds space, when all predictors equal zero.
-Because we'll code up our predictors with $\pm$0.5 sum coding, our $\alpha$ represents the grand mean of the outcome.
+Because we'll code up our predictors with $\pm$ 0.5 sum coding, our $\alpha$ represents the grand mean of the outcome.
 
 Our goal: to come up with a weakly regularising prior that allows the outcome's grand mean to take on basically any value.
 And for the intercept in particular, it's useful to consider how this prior translates to probability space.
@@ -439,7 +439,7 @@ The $\beta$s represent the effects of interest—the main effects of $cond$ and 
 Note: I generally use the same weakly regularising prior for all the $\beta$s, especially if they're all on the same scale or coded the same way.
 
 We found a decent prior for the intercept, $\alpha$, by considering the mapping from log-odds to probability space.
-There's no direct mapping for the $\beta$s in the same way.
+**There's no direct mapping for the $\beta$s in the same way.**
 This is because the $\beta$s are added to the intercept in log-odds space; they never surface directly into the outcome space themselves, so it doesn't make sense to think of them in terms of probabilities.
 
 That $\beta$s don't stand alone makes it a bit harder to reason about what priors are sensible.
@@ -476,15 +476,20 @@ mymodel <- brm(myoutcome ~ mypredictor + (1 | mygroup),
 
 
 - The first argument is the model formula in `lme4` syntax.
-- The `data=` argument tells `brm()` where to get the data.
+- The `data=` argument names the data frame where the data to analyse can be found.
 - The `family=` argument defines the model family (`bernoulli()`, `gaussian()`, etc.).
 - The `prior=` argument defines the priors that the model will use. If there is no `prior=` argument, the model will use the default priors.
 - The line `backend = 'cmdstanr'` argument specifies that the model will be fit using CmdStan.
 - The line `sample_prior = 'only'` is what makes this model into a *prior* predictive model: it ignores the data and uses only the priors to estimate the posteriors (basically just reproducing the priors). Removing this line will cause the model to take the data into account when estimating posteriors, and we'll do this when we properly fit the model.
 
 
-Copy the template above to fit a prior predictive model with the formula `sentence_accepted ~ cond + sent + condsent` and the very-wide prior `normal(0, 10)` for `class = b` ("b" stands for "beta"), using data from `acc`.
+**Copy and adapt the template above** to fit a prior predictive model with the formula `sentence_accepted ~ cond + sent + condsent` and the very-wide prior `normal(0, 10)` for `class = b` ("b" stands for "beta"), using data from `acc`.
 Name the model `priorpred10`.
+
+
+```{r echo=TRUE, eval=FALSE}
+priorpred10 <- ...
+```
 
 ::: {.callout-tip collapse="true"}
 #### Bayesian hierarchical models
@@ -493,13 +498,9 @@ In an IRL version of this analysis, we'd of course also include group-level effe
 For ease of exposition, we'll skip those for now and just treat all data points as independent.
 
 If you want to learn how to do hierarchical models in a Bayesian framework, see, e.g., [here](https://vasishth.github.io/bayescogsci/book/ch-hierarchical.html).
+It's essentially the same as what you're used to, with the addition of a few more priors.
 
 :::
-
-
-```{r echo=TRUE, eval=FALSE}
-priorpred10 <- ...
-```
 
 
 ```{r}
@@ -515,8 +516,7 @@ priorpred10 <- brm(sentence_accepted ~ cond + sent + condsent,
                sample_prior = 'only')
 ```
 
-This model will estimate posteriors based on the priors only, ignoring all the data (essentially reproducing the priors).
-Now we'll use these posteriors to generate some new data and see whether it look reasonable.
+This model will estimate posteriors that reproduce the priors, ignoring the data, so that we can use these posteriors to generate some new data and see whether it look reasonable.
 
 Generating predictive data is such a common thing to do that brms comes with a useful function that helps us do it graphically: `pp_check()` (documentation [here](https://paul-buerkner.github.io/brms/reference/pp_check.brmsfit.html)).
 
@@ -525,7 +525,7 @@ Here's what the arguments we pass to `pp_check()` mean:
 
 - `type = 'stat'` is one possible type of plot generated by `pp_check()`. It applies some summary statistic to the generated data.
 - `stat = mean` says that our summary statistic is going to be the function `mean()`.
-- `prefix = 'ppd'` hides the observed data, which is shown by default, displaying only the predictive distributions ("ppd" = "prior predictive distribution").
+- `prefix = 'ppd'` hides the observed data, which is shown by default, displaying only the predictive distributions ("ppd" = "prior predictive distribution"). It doesn't make sense to include the data in the plot, because our prior predictive model didn't take it into account.
 
 ```{r echo=TRUE, message=FALSE}
 pp_check(priorpred10,      
@@ -648,16 +648,19 @@ pp_5 <- pp_check(priorpred5,
 ```
 
 
-**When choosing between these priors, we need to balance an even spread of plausible values with a reasonable effect size.**
+**When choosing between these priors, we need to balance our desires for an even spread of plausible values and for a reasonable effect size.**
 
 The spread, perhaps counterintuitively, is most even with the narrowest prior, $Normal(0, 0.1)$.
 But 95% of the plausible values in this prior fall within the range of about [–0.2, 0.2] log-odds—that's nothing!
 
 If we move one step broader and consider $Normal(0, 1)$, we still have a decently uniform spread of prior predictive means, and now 95% of plausible effect sizes are between [–2, 2] log-odds. 
 That's better.
+(Intuitions about reasonable effect sizes are built through experience.
+If you don't have them yet, don't worry, you'll get there!)
 
-And the broader priors produce more skewed distributions, so we'll stick with $Normal(0, 1)$.
-Our final model is:
+Finally, the broader priors permit a wide range of effect sizes, but they produce increasingly skewed distributions of predictive means, so we'll stick with $Normal(0, 1)$.
+
+**Thus, our final model is:**
 
 $$
 \begin{aligned}
@@ -677,7 +680,7 @@ $$
 
 1. Find a **likelihood** suitable for the outcome data.
 
-2. Identify the **parameters** required for the model you want to fit.
+2. Identify the **parameters** required by the likelihood and by the line you want to fit.
 
 3. Use prior predictive checks to find plausible **priors** for each of those parameters.
 

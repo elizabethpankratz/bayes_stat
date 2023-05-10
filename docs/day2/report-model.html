@@ -262,7 +262,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="summarising-the-posteriors" class="level2">
 <h2 class="anchored" data-anchor-id="summarising-the-posteriors">Summarising the posteriors</h2>
-<p>The posterior distributions estimated by the model are sampled using MCMC. This essentially means that each parameter has a posterior distribution consisting of many individual sampled values. Like with any variable, we can compute summary statistics over these distributions; that’s what <code>summary()</code> gives us.</p>
+<p>Time to delve into the actual estimates given by <code>summary()</code>!</p>
 <ul>
 <li>Under <code>Estimate</code>, we get the mean of the posterior distribution of each parameter.</li>
 <li>Under <code>Est.Error</code>, we get the standard deviation.</li>
@@ -397,7 +397,7 @@ The New Statistics
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">xtable</span>(<span class="fu">fixef</span>(acc_fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>% latex table generated in R 4.3.0 by xtable 1.8-4 package
-% Wed May 10 13:41:17 2023
+% Wed May 10 17:12:48 2023
 \begin{table}[ht]
 \centering
 \begin{tabular}{rrrrr}
@@ -441,7 +441,7 @@ Intercept &amp; 0.32 &amp; 0.06 &amp; 0.20 &amp; 0.43 \\
 <p>We fit a Bayesian linear model with a Bernoulli likelihood, predicting sentence acceptance as a function of condition, sentence type, and their interaction. The model used weakly regularising priors that we selected based on prior predictive checks.</p>
 <p>The model estimates a likely-negative effect of condition (<span class="math inline">\(\beta\)</span> = –0.18 log-odds, 95% CrI [–0.41, 0.04]), meaning that participants in the production condition are probably less likely to accept sentences than are participants in the comprehension condition. However, the 95% CrI contains positive values as well, indicating some uncertainty about the direction of the effect.</p>
 <p>There is more certainty in the estimate of the much larger effect of sentence type (<span class="math inline">\(\beta\)</span> = 1.84 log-odds, 95% CrI [–1.62, 2.08]); the model is sure that word order sentences are much more likely to be accepted than case-marking sentences are.</p>
-<p>Finally, we hypothesised that we would observe a negative interaction, with a larger difference between sentence types in the comprehension condition than the production condition. However, the coefficient that the model estimates is almost entirely positive (<span class="math inline">\(\beta\)</span> = 0.22, 95% CrI: [–0.01, 0.45]), giving much more credibility to an interaction going in the <em>opposite</em> direction to the one we hypothesised.</p>
+<p>Finally, we hypothesised that we would observe a negative interaction, with a larger difference between sentence types in the comprehension condition than the production condition. However, the coefficient that the model estimates is almost entirely positive (<span class="math inline">\(\beta\)</span> = 0.22, 95% CrI: [–0.01, 0.45]), giving much more credibility to an interaction going in the <em>opposite</em> direction to the one we predicted.</p>
 </blockquote>
 <p><strong>Notice that <em>nowhere</em> are we talking about “evidence” or “significance” or “rejecting the null”.</strong> We’re also not focused on whether or not the 95% CrIs contain zero. Rather, we’re looking at the range of estimates that the 95% CrIs contain, and <strong>observing the extent to which this is consistent with our hypotheses.</strong></p>
 <p>(If you do want to do Bayesian hypothesis testing and actually find “evidence” for one model over another, you can do this using <a href="https://vasishth.github.io/bayescogsci/book/ch-bf.html">Bayes factors</a>.)</p>
@@ -449,7 +449,8 @@ Intercept &amp; 0.32 &amp; 0.06 &amp; 0.20 &amp; 0.43 \\
 </section>
 <section id="take-home-message-about-interpreting-bayesian-models" class="level2">
 <h2 class="anchored" data-anchor-id="take-home-message-about-interpreting-bayesian-models">Take-home message about interpreting Bayesian models</h2>
-<p>The most that this Bayesian inferential model can do is <strong>allocate its belief over a range of possible effects, of possible parameter values; we are not finding evidence for or against any effects or hypotheses.</strong> This is a crucial thing to know and understand, and it might feel uncomfortable and nebulous at first. But the payoff to dealing with this uncertainty is a model that gives you much better interpretability.</p>
+<p>The most that this Bayesian inferential model can do is <strong>allocate its belief over a range of possible effects, of possible parameter values; we are not finding evidence for or against any effects or hypotheses.</strong></p>
+<p>This is a crucial thing to know and understand, and it might feel uncomfortable and nebulous at first. But the payoff to dealing with this uncertainty is <strong>a model that is interpretable in more diverse, interesting ways,</strong> since you’re not limited to the binary decision of “reject the null” or “fail to reject the null”.</p>
 
 
 </section>

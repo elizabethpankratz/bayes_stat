@@ -228,7 +228,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#anatomy-of-a-bayesian-model" id="toc-anatomy-of-a-bayesian-model" class="nav-link active" data-scroll-target="#anatomy-of-a-bayesian-model">Anatomy of a Bayesian model</a></li>
   <li><a href="#choosing-a-likelihood" id="toc-choosing-a-likelihood" class="nav-link" data-scroll-target="#choosing-a-likelihood">Choosing a likelihood</a>
   <ul class="collapse">
-  <li><a href="#gaussian-normal" id="toc-gaussian-normal" class="nav-link" data-scroll-target="#gaussian-normal">Gaussian (normal)</a></li>
+  <li><a href="#normal-gaussian" id="toc-normal-gaussian" class="nav-link" data-scroll-target="#normal-gaussian">Normal (Gaussian)</a></li>
   <li><a href="#log-normal" id="toc-log-normal" class="nav-link" data-scroll-target="#log-normal">Log-normal</a></li>
   <li><a href="#bernoulli" id="toc-bernoulli" class="nav-link" data-scroll-target="#bernoulli">Bernoulli</a></li>
   <li><a href="#other-likelihoods" id="toc-other-likelihoods" class="nav-link" data-scroll-target="#other-likelihoods">Other likelihoods</a></li>
@@ -266,7 +266,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="anatomy-of-a-bayesian-model" class="level2">
 <h2 class="anchored" data-anchor-id="anatomy-of-a-bayesian-model">Anatomy of a Bayesian model</h2>
-<p>Recall from yesterday that a Bayesian model combines the <strong>likelihood</strong> of the data, given different hypotheses, with the <strong>prior probabilities</strong> of those hypotheses, to give us the <strong>posterior probabilities</strong> of how probable different hypotheses are, given the data.</p>
+<p>A Bayesian model combines the <strong>likelihood</strong> of the data, given different hypotheses, with the <strong>prior probabilities</strong> of those hypotheses, to give us the <strong>posterior probabilities</strong> of how probable different hypotheses are, given the data.</p>
 <p>When we’re doing Bayesian inference, <strong>these hypotheses correspond to different parameter values</strong>: different values that the model’s coefficients can plausibly take on. The priors over these parameter values define how plausible we think different values are <em>a priori</em>. And the model will produce posteriors over the same parameter values that tell us what parameter values the model thinks are plausible, given the data.</p>
 <p>But before we get to the posterior, we’ll need to define for our model a likelihood and some priors. We’ll start with the likelihood because it’s the closest part of the model to the outcome, so it’s the best starting point for figuring out a model that could plausibly have generated the outcome we observe. And it’ll also affect how our priors will look later.</p>
 </section>
@@ -274,9 +274,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="anchored" data-anchor-id="choosing-a-likelihood">Choosing a likelihood</h2>
 <p>If you’ve done linear modelling before, you’ve probably already encountered this idea under the guise of the “model family”. If you know that you can fit a basic linear model to continuous outcome data, but that you need a binomial/Bernoulli/logistic model for binary outcome data, then you know how to choose a likelihood function.</p>
 <p><strong>The likelihood function is selected based on the kinds of values that the outcome variable can take on.</strong> Here are three common examples.</p>
-<section id="gaussian-normal" class="level3">
-<h3 class="anchored" data-anchor-id="gaussian-normal">Gaussian (normal)</h3>
-<p>A continuous variable, such as formant values in Hz, can be said to follow a Gaussian distribution (a.k.a. a normal distribution). A Gaussian distribution looks something like this:</p>
+<section id="normal-gaussian" class="level3">
+<h3 class="anchored" data-anchor-id="normal-gaussian">Normal (Gaussian)</h3>
+<p>A continuous variable, such as formant values in Hz, can be said to follow a normal distribution (aka a Gaussian distribution). A normal distribution looks something like this:</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -286,17 +286,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
-<p>So if we were modelling Hz, we would use a Gaussian likelihood, and we could write it like this:</p>
+<p>So if we were modelling Hz, we would use a normal likelihood, and we could write it like this:</p>
 <p><span class="math display">\[
-Hz \sim Gaussian(\mu, \sigma)
+Hz \sim Normal(\mu, \sigma)
 \]</span></p>
-<p><em>“Hz is distributed according to a Gaussian distribution with mean <span class="math inline">\(\mu\)</span> and standard deviation <span class="math inline">\(\sigma\)</span>.”</em></p>
+<p><em>“Hz is distributed according to a normal distribution with mean <span class="math inline">\(\mu\)</span> and standard deviation <span class="math inline">\(\sigma\)</span>.”</em></p>
 <p>(<span class="math inline">\(\mu\)</span> and <span class="math inline">\(\sigma\)</span> are parameters that define the distribution’s shape: where its mean is located, and how spread-out the distribution is around that mean, respectively.)</p>
-<p>If you would use a basic linear model, not a generalised linear model, in your analysis, you would choose a Gaussian likelihood.</p>
+<p>If you would use a basic linear model, not a generalised linear model, in your analysis, you would choose a Normal likelihood.</p>
 </section>
 <section id="log-normal" class="level3">
 <h3 class="anchored" data-anchor-id="log-normal">Log-normal</h3>
-<p>A continuous variable that’s positive-only and right-skewed, such as reaction times, might follow a Gaussian distribution only once it’s been log-transformed. This means that, without any transformation, it follows a log-normal distribution.</p>
+<p>A continuous variable that’s positive-only and right-skewed, such as reaction times, might follow a normal distribution only once it’s been log-transformed. This means that, without any transformation, it follows a log-normal distribution.</p>
 <div class="cell" data-layout-align="center">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -311,11 +311,11 @@ Hz \sim Gaussian(\mu, \sigma)
 RT \sim LogNormal(\mu, \sigma)
 \]</span></p>
 <p><em>“RT is distributed according to a lognormal distribution with location <span class="math inline">\(\mu\)</span> and scale <span class="math inline">\(\sigma\)</span>.”</em></p>
-<p>Equivalently, one could log-transform RTs and model them with a Gaussian likelihood:</p>
+<p>Equivalently, one could log-transform RTs and model them with a normal likelihood:</p>
 <p><span class="math display">\[
-\log(RT) \sim Gaussian(\mu, \sigma)
+\log(RT) \sim Normal(\mu, \sigma)
 \]</span></p>
-<p>This is how it’s typically done in frequentist circles, but Bayesian models make it just as easy to use a lognormal likelihood as a Gaussian one.</p>
+<p>This is how it’s typically done in frequentist circles, but Bayesian models make it just as easy to use a lognormal likelihood as a normal one.</p>
 </section>
 <section id="bernoulli" class="level3">
 <h3 class="anchored" data-anchor-id="bernoulli">Bernoulli</h3>
@@ -351,10 +351,10 @@ Intuition: How can a probability produce binary outcomes?
 <section id="begin-building-the-model" class="level2">
 <h2 class="anchored" data-anchor-id="begin-building-the-model">Begin building the model</h2>
 <p>Now that we have a likelihood, the next step is to think about what priors our model needs.</p>
-<p>You saw that each of those likelihood functions above contains parameters that define their shape: <span class="math inline">\(\mu\)</span>, <span class="math inline">\(\sigma\)</span>, <span class="math inline">\(\theta\)</span>. <strong>Every parameter in a Bayesian model needs to have a prior</strong> that tells the model which values are a priori plausible for that parameter to take on.</p>
+<p>You saw that each of those likelihood functions above contains parameters that define their shape: <span class="math inline">\(\mu\)</span>, <span class="math inline">\(\sigma\)</span>, <span class="math inline">\(\theta\)</span>. <strong>Every parameter in a Bayesian model needs to have a prior</strong> that tells the model which values are <em>a priori</em> plausible for that parameter to take on.</p>
 <p>In this section, we build the model up bit by bit. This process will show us how many parameters our model has, and therefore what priors the model needs. We’ll start with the likelhood.</p>
 <p>To build up the model, we’ll start off by defining the model’s likelihood.</p>
-<p>We determined which likelihood we need above: acceptance <span class="math inline">\(acc\)</span> follows a Bernoulli distribution.</p>
+<p>We determined already which likelihood we need: acceptance <span class="math inline">\(acc\)</span> follows a Bernoulli distribution.</p>
 <p><span class="math display">\[acc \sim Bernoulli(\theta)\]</span></p>
 <p>We’re interested in modelling what affects <span class="math inline">\(\theta\)</span>, the probability of accepting a sentence. In other words, we want <span class="math inline">\(\theta\)</span> to be able to take on different values, depending on the condition participants were in and what kinds of sentences they were seeing. <span class="math inline">\(\theta\)</span> should be high in a certain situation if participants are more likely to accept sentences, and it should be low in another situation if they are more likely to reject them.</p>
 <p>OK, well, more precisely: we actually want <span class="math inline">\(logit(\theta)\)</span>, the <em>log-odds</em> of accepting a sentence, to be able to take on different values. Converting probabilities (bounded between 0 and 1) into log-odds (unbounded) moves our estimation into a continuous space in which a line, also a continuous thing, can reasonably be fit.</p>
@@ -444,18 +444,18 @@ Cromwell’s Rule
 <section id="consider-order-of-magnitudemodel-space" class="level3">
 <h3 class="anchored" data-anchor-id="consider-order-of-magnitudemodel-space">Consider order of magnitude/model space</h3>
 <p><strong>TLDR: Your priors must match the order of magnitude of the space the model is fit in.</strong></p>
-<p>If the model’s coefficient estimates are interpretable using the same units as the outcome (e.g., if you’re using a Gaussian likelihood), then we can say that the model is “fit in the outcome space”. If your model is fit in the outcome space, then you need to think about what <strong>order of magnitude</strong> our outcome variable has.</p>
+<p>If the model’s coefficient estimates are interpretable using the same units as the outcome (e.g., if you’re using a normal likelihood), then we can say that the model is “fit in the outcome space”. If your model is fit in the outcome space, then you’ll need to think about what <strong>order of magnitude</strong> your outcome variable has.</p>
 <ul>
 <li>For example, if your outcome is raw reaction time, then your effects might be in the hundreds (of milliseconds).</li>
-<li>But if your outcome is log reaction time, then your effects are probably in the single digits (of log units).</li>
+<li>But if your outcome is <em>log</em> reaction time, then your effects are probably in the single digits (of log units).</li>
 </ul>
 <p>A weak prior on the log scale is an incredibly restrictive prior on the millisecond scale. So the prior has to match the order of magnitude of the outcome.</p>
 <p>If the model is <em>not</em> fit in the outcome space—i.e., if the outcome is transformed into a different space, and then the linear model is fit there—we need to know what space the model is fit in. This is because <strong>the priors have to be on the transformed scale,</strong> not the outcome scale.</p>
-<p>In our case, our model has a logit link function that transforms probabilities into log-odds, and then the linear expression is fit in log-odds space. That means our priors have to be <strong>on the log-odds scale</strong>.</p>
+<p>In our case, our model transforms probabilities into log-odds, and then the linear expression is fit in log-odds space. That means our priors have to be <strong>on the log-odds scale</strong>.</p>
 </section>
 <section id="a-prior-for-alpha" class="level3">
 <h3 class="anchored" data-anchor-id="a-prior-for-alpha">A prior for <span class="math inline">\(\alpha\)</span></h3>
-<p><span class="math inline">\(\alpha\)</span> represents the intercept of our linear model. It is the outcome, in log-odds space, when all predictors equal zero. Because we’ll code up our predictors with $$0.5 sum coding, our <span class="math inline">\(\alpha\)</span> represents the grand mean of the outcome.</p>
+<p><span class="math inline">\(\alpha\)</span> represents the intercept of our linear model. It is the outcome, in log-odds space, when all predictors equal zero. Because we’ll code up our predictors with <span class="math inline">\(\pm\)</span> 0.5 sum coding, our <span class="math inline">\(\alpha\)</span> represents the grand mean of the outcome.</p>
 <p>Our goal: to come up with a weakly regularising prior that allows the outcome’s grand mean to take on basically any value. And for the intercept in particular, it’s useful to consider how this prior translates to probability space.</p>
 <p>Let’s have a look at three different log-odds priors (in the left panels), and how they look once back-transformed into probability space (right panels). The higher the probability density, the more plausible the model will consider those values to be.</p>
 <div class="cell" data-layout-align="center">
@@ -547,7 +547,7 @@ logit(\theta) &amp; = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\b
 <section id="a-prior-for-the-betas" class="level3">
 <h3 class="anchored" data-anchor-id="a-prior-for-the-betas">A prior for the <span class="math inline">\(\beta\)</span>s</h3>
 <p>The <span class="math inline">\(\beta\)</span>s represent the effects of interest—the main effects of <span class="math inline">\(cond\)</span> and <span class="math inline">\(sent\)</span>, and the effect of their interaction—in log-odds space. Note: I generally use the same weakly regularising prior for all the <span class="math inline">\(\beta\)</span>s, especially if they’re all on the same scale or coded the same way.</p>
-<p>We found a decent prior for the intercept, <span class="math inline">\(\alpha\)</span>, by considering the mapping from log-odds to probability space. There’s no direct mapping for the <span class="math inline">\(\beta\)</span>s in the same way. This is because the <span class="math inline">\(\beta\)</span>s are added to the intercept in log-odds space; they never surface directly into the outcome space themselves, so it doesn’t make sense to think of them in terms of probabilities.</p>
+<p>We found a decent prior for the intercept, <span class="math inline">\(\alpha\)</span>, by considering the mapping from log-odds to probability space. <strong>There’s no direct mapping for the <span class="math inline">\(\beta\)</span>s in the same way.</strong> This is because the <span class="math inline">\(\beta\)</span>s are added to the intercept in log-odds space; they never surface directly into the outcome space themselves, so it doesn’t make sense to think of them in terms of probabilities.</p>
 <p>That <span class="math inline">\(\beta\)</span>s don’t stand alone makes it a bit harder to reason about what priors are sensible. How do we get around this? Enter <strong>prior predictive checks</strong>.</p>
 <section id="prior-predictive-checks-in-brms" class="level4">
 <h4 class="anchored" data-anchor-id="prior-predictive-checks-in-brms">Prior predictive checks in brms</h4>
@@ -566,13 +566,16 @@ logit(\theta) &amp; = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\b
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">sample_prior =</span> <span class="st">'only'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <ul>
 <li>The first argument is the model formula in <code>lme4</code> syntax.</li>
-<li>The <code>data=</code> argument tells <code>brm()</code> where to get the data.</li>
+<li>The <code>data=</code> argument names the data frame where the data to analyse can be found.</li>
 <li>The <code>family=</code> argument defines the model family (<code>bernoulli()</code>, <code>gaussian()</code>, etc.).</li>
 <li>The <code>prior=</code> argument defines the priors that the model will use. If there is no <code>prior=</code> argument, the model will use the default priors.</li>
 <li>The line <code>backend = 'cmdstanr'</code> argument specifies that the model will be fit using CmdStan.</li>
 <li>The line <code>sample_prior = 'only'</code> is what makes this model into a <em>prior</em> predictive model: it ignores the data and uses only the priors to estimate the posteriors (basically just reproducing the priors). Removing this line will cause the model to take the data into account when estimating posteriors, and we’ll do this when we properly fit the model.</li>
 </ul>
-<p>Copy the template above to fit a prior predictive model with the formula <code>sentence_accepted ~ cond + sent + condsent</code> and the very-wide prior <code>normal(0, 10)</code> for <code>class = b</code> (“b” stands for “beta”), using data from <code>acc</code>. Name the model <code>priorpred10</code>.</p>
+<p><strong>Copy and adapt the template above</strong> to fit a prior predictive model with the formula <code>sentence_accepted ~ cond + sent + condsent</code> and the very-wide prior <code>normal(0, 10)</code> for <code>class = b</code> (“b” stands for “beta”), using data from <code>acc</code>. Name the model <code>priorpred10</code>.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>priorpred10 <span class="ot">&lt;-</span> ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 <div class="callout-tip callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -586,23 +589,20 @@ Bayesian hierarchical models
 <div id="callout-5" class="callout-5-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>In an IRL version of this analysis, we’d of course also include group-level effects (what frequentists call “random effects”). For ease of exposition, we’ll skip those for now and just treat all data points as independent.</p>
-<p>If you want to learn how to do hierarchical models in a Bayesian framework, see, e.g., <a href="https://vasishth.github.io/bayescogsci/book/ch-hierarchical.html">here</a>.</p>
+<p>If you want to learn how to do hierarchical models in a Bayesian framework, see, e.g., <a href="https://vasishth.github.io/bayescogsci/book/ch-hierarchical.html">here</a>. It’s essentially the same as what you’re used to, with the addition of a few more priors.</p>
 </div>
 </div>
-</div>
-<div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>priorpred10 <span class="ot">&lt;-</span> ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-layout-align="center">
 
 </div>
-<p>This model will estimate posteriors based on the priors only, ignoring all the data (essentially reproducing the priors). Now we’ll use these posteriors to generate some new data and see whether it look reasonable.</p>
+<p>This model will estimate posteriors that reproduce the priors, ignoring the data, so that we can use these posteriors to generate some new data and see whether it look reasonable.</p>
 <p>Generating predictive data is such a common thing to do that brms comes with a useful function that helps us do it graphically: <code>pp_check()</code> (documentation <a href="https://paul-buerkner.github.io/brms/reference/pp_check.brmsfit.html">here</a>).</p>
 <p>Using your model <code>priorpred10</code>, run the following code. Here’s what the arguments we pass to <code>pp_check()</code> mean:</p>
 <ul>
 <li><code>type = 'stat'</code> is one possible type of plot generated by <code>pp_check()</code>. It applies some summary statistic to the generated data.</li>
 <li><code>stat = mean</code> says that our summary statistic is going to be the function <code>mean()</code>.</li>
-<li><code>prefix = 'ppd'</code> hides the observed data, which is shown by default, displaying only the predictive distributions (“ppd” = “prior predictive distribution”).</li>
+<li><code>prefix = 'ppd'</code> hides the observed data, which is shown by default, displaying only the predictive distributions (“ppd” = “prior predictive distribution”). It doesn’t make sense to include the data in the plot, because our prior predictive model didn’t take it into account.</li>
 </ul>
 <div class="cell" data-layout-align="center">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pp_check</span>(priorpred10,      </span>
@@ -659,10 +659,11 @@ Prior predictive distributions
 </div>
 </div>
 </div>
-<p><strong>When choosing between these priors, we need to balance an even spread of plausible values with a reasonable effect size.</strong></p>
+<p><strong>When choosing between these priors, we need to balance our desires for an even spread of plausible values and for a reasonable effect size.</strong></p>
 <p>The spread, perhaps counterintuitively, is most even with the narrowest prior, <span class="math inline">\(Normal(0, 0.1)\)</span>. But 95% of the plausible values in this prior fall within the range of about [–0.2, 0.2] log-odds—that’s nothing!</p>
-<p>If we move one step broader and consider <span class="math inline">\(Normal(0, 1)\)</span>, we still have a decently uniform spread of prior predictive means, and now 95% of plausible effect sizes are between [–2, 2] log-odds. That’s better.</p>
-<p>And the broader priors produce more skewed distributions, so we’ll stick with <span class="math inline">\(Normal(0, 1)\)</span>. Our final model is:</p>
+<p>If we move one step broader and consider <span class="math inline">\(Normal(0, 1)\)</span>, we still have a decently uniform spread of prior predictive means, and now 95% of plausible effect sizes are between [–2, 2] log-odds. That’s better. (Intuitions about reasonable effect sizes are built through experience. If you don’t have them yet, don’t worry, you’ll get there!)</p>
+<p>Finally, the broader priors permit a wide range of effect sizes, but they produce increasingly skewed distributions of predictive means, so we’ll stick with <span class="math inline">\(Normal(0, 1)\)</span>.</p>
+<p><strong>Thus, our final model is:</strong></p>
 <p><span class="math display">\[
 \begin{aligned}
 \text{acc} &amp; \sim Bernoulli(\theta) \\
@@ -683,7 +684,7 @@ logit(\theta) &amp; = \alpha + (\beta_1 \cdot cond) + (\beta_2 \cdot sent) + (\b
 <h2 class="anchored" data-anchor-id="summary-the-model-building-workflow">Summary: The model-building workflow</h2>
 <ol type="1">
 <li><p>Find a <strong>likelihood</strong> suitable for the outcome data.</p></li>
-<li><p>Identify the <strong>parameters</strong> required for the model you want to fit.</p></li>
+<li><p>Identify the <strong>parameters</strong> required by the likelihood and by the line you want to fit.</p></li>
 <li><p>Use prior predictive checks to find plausible <strong>priors</strong> for each of those parameters.</p></li>
 </ol>
 

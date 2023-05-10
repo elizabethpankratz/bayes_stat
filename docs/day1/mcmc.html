@@ -211,7 +211,7 @@ ul.task-list li input[type="checkbox"] {
 
 <p>Bayesian data analysis is seen as a cutting-edge, up-and-coming method, even though Bayes’ Theorem dates back to 1763. Why is that? What stopped the Bayesian framework from taking off sooner?</p>
 <p><strong>The short answer:</strong> Computational limitations.</p>
-<p><strong>The slightly longer answer:</strong> Estimating posterior distributions analytically (i.e., using calculus) works sometimes, but it’s not possible for every kind of model. Another way to find the posterior is to approximate it by <strong>drawing samples from it</strong>. This is computationally challenging, and it’s only fairly recently that sampling methods have been developed so that posteriors can be estimated by any old linguist with a laptop.</p>
+<p><strong>The slightly longer answer:</strong> Finding posterior distributions analytically (i.e., using calculus) works sometimes, but it’s not possible for every kind of model. Another way to find the posterior is to approximate it by <strong>drawing samples from it</strong>. This is computationally challenging, and it’s only fairly recently that sampling methods have been developed so that posteriors can be estimated by any old linguist with a laptop.</p>
 <div class="callout-tip callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -233,14 +233,16 @@ The longest answer
 </div>
 </div>
 <p>The method that brms uses is called <strong>Markov Chain Monte Carlo, or MCMC.</strong> It treats the posterior as a kind of landscape, and identifies the areas of highest probability essentially by running a physics simulation.</p>
-<p>Imagine there’s a pit or a crater in the ground, and you throw a bouncy ball in. The ball will bounce around a lot, but most of the time, it’ll bounce toward/around the deepest point in the middle of the crater.</p>
+<p>Imagine there’s a pit in the ground, and you throw a bouncy ball in. The ball will bounce around a lot, but most of the time, it’ll bounce toward/around the deepest point in the middle of the pit.</p>
 <p>This means that, if every bounce is a sample, then you’ll have <strong>more samples from the part where the pit is deepest.</strong> If you take these samples and make a density plot, you’ll have higher density (because you have more samples) in the area of greatest depth.</p>
 <p><img src="../imgs/mcmc.gif" class="img-fluid"></p>
 <p>This is basically how MCMC works: by bouncing around the unknown/unknowable “landscape” of the posterior and exploring it by sampling, giving us more samples (= higher probability density) in those deeper (= higher-probability) areas.</p>
 <p>If we take enough samples, <strong>we still get a decent approximation of the shape of the posterior, without needing to compute it exactly.</strong></p>
-<p>In reality, brms doesn’t just throw one proverbial bouncy ball into the proverbial pit, but four (and they’re also not called bouncy balls, but <strong>“chains”</strong>️ 😔). These chains run, by default, for 2,000 iterations each.</p>
-<p>The first 1,000 iterations are used to explore the posterior landscape and hopefully eventually find a higher-probability area: this is called the <strong>“warm-up” or “burn-in” period.</strong></p>
-<p>The 1,000 iterations after that are spent traversing the posterior and drawing samples. And it’s those samples that brms will summarise when it describes each parameter’s posterior to us.</p>
+<p>In reality, brms doesn’t just throw one proverbial bouncy ball into the proverbial pit, but four (and they’re also not called bouncy balls 😔 instead they’re called “chains”). These chains run, by default, for 2,000 iterations each.</p>
+<ul>
+<li>The first 1,000 iterations are used to explore the posterior landscape and hopefully eventually find a higher-probability area: this is called the <strong>“warm-up” or “burn-in” period.</strong></li>
+<li>The next 1,000 iterations are spent traversing the posterior and drawing samples. And it’s those samples that brms will summarise when it describes each parameter’s posterior to us.</li>
+</ul>
 
 
 
